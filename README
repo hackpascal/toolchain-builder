@@ -1,0 +1,71 @@
+GCC 工具链自动编译脚本
+
+本工具用于自动编译指定的工具链，可以同时生成运行于本机系统 (Build system) 和 Windows 系统（可以修改）的两套工具链
+
+具体编译规则指定于 .config 中
+defconfig 目录包含一些预定义的规则，将其复制到脚本根目录并改名为 .config 后即可编译
+
+编译方式：
+	make
+或
+	make -j<N>
+
+编译生成的工具链位于 output 目录中
+
+.config 说明：
+ARCH	用于 Linux 内核的架构名称
+TARGET	工具链的 target (--target=$(TARGET))
+HOST	工具链的第二个运行环境 (--host=$(HOST))，需要 PATH 中存在此运行环境的工具链相关目录
+VARIANT	工具链的变体名（即不同优化/指令集等使用不同的名字），没有格式要求，任意指定
+PROGRAM_PREFIX	工具链的程序名前缀，跟 TARGET 不同时，会创建符号链接
+TARGET_GCC_FLAGS	编译 GCC 时传入的额外 configure 参数
+LIBC	工具链使用的 C 库，可以是 glibc uclibc-ng musl newlib
+LIBC_USE_SOFT_FLOAT	C 库是否使用软件浮点运算（即禁用 FPU）（可选值是 y 或者留空）
+LIBC_DEBUG	C 库是否包含调试信息（不影响优化）（可选值是 y 或者留空）
+UCLIBC_VARIANT	uClibc-ng 配置文件的变体，留空使用 $(TARGET).config，否则使用 $(TARGET).$(UCLIBC_VARIANT).config
+TARGET_CFLAGS	编译目标平台运行库的额外 CFLAGS,也应用于 CXXFLAGS
+TARGET_LDFLAGS	编译目标平台运行库的额外 LDFLAGS
+
+生成的工具链位置：
+运行于本机系统的工具链位于 output/$(TARGET)/$(VARIANT)/toolchain/usr
+运行于第二个运行环境的工具链位于 output/$(TARGET)/$(VARIANT)/target/usr
+
+其它说明：
+如果软件包下载失败，请手动下载后放入 dl 目录
+
+===============================================================================
+
+Auto-build scripts for GCC cross-compiling toolchain
+
+This tool is used to build specific toolchains. It can produce a toolchain running under the build system and a toolchain running under Windows (or other platforms)
+
+The build rules are set in .config
+The folder defconfig contains some pre-defined configuration files. You can copy one of them in to the build root and rename it to .config to build.
+
+How to build:
+	make
+or
+	make -j<N>
+
+The output toolchains are stored in the folder 'output'.
+
+.config description:
+ARCH	Architecture name used for Linux kernel compiling
+TARGET	Target (GNU tirplet) for the toolchain (--target=$(TARGET))
+HOST	Host (not the build system, GNU triplet) for the toolchain (--host=$(HOST)), requires pre-built toolchain for the host
+VARIANT	Variant name for this build (to identify the different optimization/ISA and etc.), no format requirements
+PROGRAM_PREFIX	Program prefix. Will create symbolic links when it's different from TARGET
+TARGET_GCC_FLAGS	Extra arguments passed to the GCC configure script
+LIBC	The C library used for the toolchain, valid names are glibc, uclibc-ng, musl and newlib
+LIBC_USE_SOFT_FLOAT	Whether to use soft-float in C library ('y' for Yes, empty for No)
+LIBC_DEBUG	Whether to include debug symbols in C library ('y' for Yes, empty for No)
+UCLIBC_VARIANT	COnfiguration variant for uClibc-ng. Leave empty to use $(TARGET).config，otherwise uses $(TARGET).$(UCLIBC_VARIANT).config
+TARGET_CFLAGS	Extra CFLAGS passed to target library builds (also applied to CXXFLAGS)
+TARGET_LDFLAGS	Extra LDFLAGS passed to target library builds
+
+Path of generated toolchains:
+Running on build system: output/$(TARGET)/$(VARIANT)/toolchain/usr
+Running on $(HOST): output/$(TARGET)/$(VARIANT)/target/usr
+
+Others:
+If the source code archive is failed to download, you can download it manually and copy to the folder 'dl'.

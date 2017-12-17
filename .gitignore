@@ -1,0 +1,9 @@
+/build
+/output
+/dl
+/.config
+
+*~
+*.rej
+*.orig
+/config.guess
