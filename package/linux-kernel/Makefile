@@ -7,7 +7,7 @@ URL=https://cdn.kernel.org/pub/linux/kernel/v4.x/$(SOURCE_FILE)
 PACKAGE_SOURCE_DIR=$(BUILD_SOURCE_DIR)/$(NAME)-$(VERSION)
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $@ $(URL)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \

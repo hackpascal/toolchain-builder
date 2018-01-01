@@ -26,7 +26,7 @@ endif
 
 
 download:
-	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $@ $(URL)
+	[ -f $(DLDIR)/$(SOURCE_FILE) ] || wget -O $(DLDIR)/$(SOURCE_FILE) $(URL) || (rm -f $(DLDIR)/$(SOURCE_FILE) && false)
 
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
