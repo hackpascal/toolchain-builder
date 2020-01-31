@@ -77,7 +77,13 @@ mpc: gmp mpfr
 isl: gmp
 	$(MAKE) -C $(PACKAGEDIR)/isl
 
-binutils: gmp mpfr mpc isl
+libiconv:
+	$(MAKE) -C $(PACKAGEDIR)/libiconv
+
+zlib:
+	$(MAKE) -C $(PACKAGEDIR)/zlib
+
+binutils: gmp mpfr mpc isl zlib libiconv
 	$(MAKE) -C $(PACKAGEDIR)/binutils
 
 dir-prep:
@@ -96,14 +102,14 @@ $(LIBC): linux-headers gcc-initial
 	$(MAKE) -C $(PACKAGEDIR)/$(LIBC)
 
 ifneq ($(LIBC_HEADERS),)
-gcc-minimum: gmp mpfr mpc isl binutils
+gcc-minimum: gmp mpfr mpc isl zlib libiconv binutils
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=minimum
 
 $(LIBC_HEADERS): gcc-minimum dir-prep
 	$(MAKE) -C $(PACKAGEDIR)/$(LIBC) headers
 endif
 
-gcc-initial: gmp mpfr mpc isl binutils $(LIBC_HEADERS)
+gcc-initial: gmp mpfr mpc isl zlib libiconv binutils $(LIBC_HEADERS)
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=initial
 else
 $(LIBC): linux-headers
@@ -114,19 +120,10 @@ gcc-final: binutils $(LIBC)
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=final
 
 else
-gcc-final: gmp mpfr mpc isl binutils dir-prep
+gcc-final: gmp mpfr mpc isl zlib libiconv binutils dir-prep
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=final
 endif
 
-gdb: mpfr
+gdb: mpfr zlib libiconv
 	$(MAKE) -C $(PACKAGEDIR)/gdb
-
-
-# Additional libraries
-
-libiconv: gcc-final
-	$(MAKE) -C $(PACKAGEDIR)/libiconv
-
-zlib: gcc-final
-	$(MAKE) -C $(PACKAGEDIR)/zlib
 
