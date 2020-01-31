@@ -1,6 +1,6 @@
 
 NAME=newlib
-VERSION=2.5.0.20170922
+VERSION=3.3.0
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=http://www.sourceware.org/pub/$(NAME)/$(NAME)-$(VERSION).tar.gz
 

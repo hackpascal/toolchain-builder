@@ -1,6 +1,6 @@
 
 NAME=mpfr
-VERSION=3.1.6
+VERSION=4.0.2
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 

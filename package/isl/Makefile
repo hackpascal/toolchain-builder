@@ -1,6 +1,6 @@
 
 NAME=isl
-VERSION=0.18
+VERSION=0.22
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=http://isl.gforge.inria.fr/$(SOURCE_FILE)
 

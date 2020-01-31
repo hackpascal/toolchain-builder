@@ -1,6 +1,6 @@
 
 NAME=gmp
-VERSION=6.1.2
+VERSION=6.2.0
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 

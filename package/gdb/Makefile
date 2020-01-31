@@ -1,6 +1,6 @@
 
 NAME=gdb
-VERSION=8.0.1
+VERSION=8.3.1
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 

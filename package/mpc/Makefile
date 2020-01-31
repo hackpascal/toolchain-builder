@@ -1,6 +1,6 @@
 
 NAME=mpc
-VERSION=1.0.3
+VERSION=1.1.0
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 

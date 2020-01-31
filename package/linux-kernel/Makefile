@@ -1,8 +1,8 @@
 
 NAME=linux
-VERSION=4.14.3
+VERSION=5.4.15
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
-URL=https://cdn.kernel.org/pub/linux/kernel/v4.x/$(SOURCE_FILE)
+URL=https://cdn.kernel.org/pub/linux/kernel/v5.x/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(BUILD_SOURCE_DIR)/$(NAME)-$(VERSION)
 

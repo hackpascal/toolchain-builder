@@ -1,6 +1,6 @@
 
 NAME=uClibc-ng
-VERSION=1.0.27
+VERSION=1.0.32
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://downloads.uclibc-ng.org/releases/$(VERSION)/$(SOURCE_FILE)
 
