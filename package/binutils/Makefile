@@ -13,9 +13,10 @@ CONFIGURE_ARGS= \
 	$(if $(HOST),--host=$(HOST)) \
 	--enable-static \
 	--disable-shared \
-	--disable-nls \
+	--enable-nls \
 	--enable-ld \
 	--enable-lto \
+	--enable-gold \
 	--with-sysroot=$(OUTPUT_TARGET_PREFIX)
 
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
