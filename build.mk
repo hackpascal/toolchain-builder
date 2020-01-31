@@ -118,7 +118,7 @@ gcc-final: gmp mpfr mpc isl binutils dir-prep
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=final
 endif
 
-gdb: gmp mpfr mpc isl
+gdb: mpfr
 	$(MAKE) -C $(PACKAGEDIR)/gdb
 
 
