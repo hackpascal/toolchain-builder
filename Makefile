@@ -70,6 +70,16 @@ else
 	true
 endif
 
+target_%:
+ifeq ($(strip $(NO_TARGET)),)
+	$(MAKE) -f build.mk BUILD_TYPE=target $(@:target_%=%)
+endif
+
+toolchain_%:
+ifeq ($(NATIVE_BUILD),)
+	$(MAKE) -f build.mk BUILD_TYPE=toolchain $(@:toolchain_%=%)
+endif
+
 else
 all:
 	echo "Missing configure file!"
