@@ -20,8 +20,7 @@ CONFIGURE_ARGS= \
 	--with-gmp=$(HOST_OUTPUT_PREFIX) \
 	--with-mpfr=$(HOST_OUTPUT_PREFIX) \
 	--with-mpc=$(HOST_OUTPUT_PREFIX) \
-	--with-isl=$(HOST_OUTPUT_PREFIX) \
-	--with-cloog=$(HOST_OUTPUT_PREFIX)
+	--with-isl=$(HOST_OUTPUT_PREFIX)
 
 all: install
 	true

@@ -15,7 +15,6 @@ CONFIGURE_ARGS= \
 	--with-mpfr=$(HOST_OUTPUT_PREFIX) \
 	--with-mpc=$(HOST_OUTPUT_PREFIX) \
 	--with-isl=$(HOST_OUTPUT_PREFIX) \
-	--with-cloog=$(HOST_OUTPUT_PREFIX) \
 	--disable-__cxa_atexit \
 	--disable-multilib \
 	--disable-libgomp \

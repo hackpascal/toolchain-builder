@@ -77,10 +77,7 @@ mpc: gmp mpfr
 isl: gmp
 	$(MAKE) -C $(PACKAGEDIR)/isl
 
-cloog: gmp isl
-	$(MAKE) -C $(PACKAGEDIR)/cloog
-
-binutils: gmp mpfr mpc isl cloog
+binutils: gmp mpfr mpc isl
 	$(MAKE) -C $(PACKAGEDIR)/binutils
 
 dir-prep:
@@ -99,14 +96,14 @@ $(LIBC): linux-headers gcc-initial
 	$(MAKE) -C $(PACKAGEDIR)/$(LIBC)
 
 ifneq ($(LIBC_HEADERS),)
-gcc-minimum: gmp mpfr mpc isl cloog binutils
+gcc-minimum: gmp mpfr mpc isl binutils
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=minimum
 
 $(LIBC_HEADERS): gcc-minimum dir-prep
 	$(MAKE) -C $(PACKAGEDIR)/$(LIBC) headers
 endif
 
-gcc-initial: gmp mpfr mpc isl cloog binutils $(LIBC_HEADERS)
+gcc-initial: gmp mpfr mpc isl binutils $(LIBC_HEADERS)
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=initial
 else
 $(LIBC): linux-headers
@@ -117,7 +114,7 @@ gcc-final: binutils $(LIBC)
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=final
 
 else
-gcc-final: gmp mpfr mpc isl cloog binutils dir-prep
+gcc-final: gmp mpfr mpc isl binutils dir-prep
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=final
 endif
 
