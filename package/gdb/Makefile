@@ -12,11 +12,11 @@ CONFIGURE_ARGS= \
 	--target=$(TARGET) \
 	$(if $(HOST),--host=$(HOST)) \
 	--disable-nls \
-	--with-system-zlib \
-	--with-gmp=$(HOST_OUTPUT_PREFIX) \
-	--with-mpfr=$(HOST_OUTPUT_PREFIX) \
-	--with-mpc=$(HOST_OUTPUT_PREFIX) \
-	--with-isl=$(HOST_OUTPUT_PREFIX)
+	--with-system-zlib
+
+LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
+LIBS_CXXFLAGS := $(LIBS_CFLAGS)
+LIBS_LDFLAGS := -L$(HOST_OUTPUT_PREFIX)/lib
 
 all: install
 	true
@@ -36,9 +36,9 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
-		CFLAGS="$(HOST_CFLAGS)" \
-		CXXFLAGS="$(HOST_CXXFLAGS)" \
-		LDFLAGS="$(HOST_LDFLAGS)" \
+		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
+		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
+		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
 			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)

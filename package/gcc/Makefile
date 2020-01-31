@@ -11,10 +11,6 @@ CONFIGURE_ARGS= \
 	--prefix=$(OUTPUT_PREFIX) \
 	--target=$(TARGET) \
 	$(if $(HOST),--host=$(HOST)) \
-	--with-gmp=$(HOST_OUTPUT_PREFIX) \
-	--with-mpfr=$(HOST_OUTPUT_PREFIX) \
-	--with-mpc=$(HOST_OUTPUT_PREFIX) \
-	--with-isl=$(HOST_OUTPUT_PREFIX) \
 	--disable-__cxa_atexit \
 	--disable-multilib \
 	--disable-libgomp \
@@ -36,6 +32,10 @@ CONFIGURE_ARGS= \
 	--with-libiconv \
 	--with-system-zlib \
 	$(TARGET_GCC_FLAGS)
+
+LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
+LIBS_CXXFLAGS := $(LIBS_CFLAGS)
+LIBS_LDFLAGS := -L$(HOST_OUTPUT_PREFIX)/lib
 
 ifneq ($(ARCH),x86)
 CONFIGURE_ARGS += --disable-decimal-float
@@ -75,9 +75,9 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
-		CFLAGS="$(HOST_CFLAGS)" \
-		CXXFLAGS="$(HOST_CXXFLAGS)" \
-		LDFLAGS="$(HOST_LDFLAGS)" \
+		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
+		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
+		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
 			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
@@ -88,12 +88,12 @@ configure: extract
 		cd $(PACKAGE_BUILD_DIR); \
 		enable_gnu_indirect_function=yes \
 		default_gnu_indirect_function=yes \
-		CFLAGS="$(HOST_CFLAGS)" \
-		CXXFLAGS="$(HOST_CXXFLAGS)" \
-		LDFLAGS="$(HOST_LDFLAGS)" \
-		CFLAGS_FOR_TARGET="$(TARGET_CFLAGS) $(GCC_DEBUG_CFLAGS)" \
-		CXXFLAGS_FOR_TARGET="$(TARGET_CXXFLAGS) $(GCC_DEBUG_CFLAGS)" \
-		LDFLAGS_FOR_TARGET="$(TARGET_LDFLAGS)" \
+		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
+		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
+		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
+		CFLAGS_FOR_TARGET="$(TARGET_CFLAGS) $(LIBS_CFLAGS) $(GCC_DEBUG_CFLAGS)" \
+		CXXFLAGS_FOR_TARGET="$(TARGET_CXXFLAGS) $(LIBS_CXXFLAGS) $(GCC_DEBUG_CFLAGS)" \
+		LDFLAGS_FOR_TARGET="$(TARGET_LDFLAGS) $(LIBS_LDFLAGS)" \
 		CC_FOR_TARGET="$(TOOLCHAIN_PREFIX)gcc" \
 		CXX_FOR_TARGET="$(TOOLCHAIN_PREFIX)g++" \
 		AR_FOR_TARGET="$(TOOLCHAIN_PREFIX)ar" \
