@@ -83,6 +83,12 @@ libiconv:
 zlib:
 	$(MAKE) -C $(PACKAGEDIR)/zlib
 
+expat:
+	$(MAKE) -C $(PACKAGEDIR)/expat
+
+xz:
+	$(MAKE) -C $(PACKAGEDIR)/xz
+
 binutils: gmp mpfr mpc isl zlib libiconv
 	$(MAKE) -C $(PACKAGEDIR)/binutils
 
@@ -124,6 +130,6 @@ gcc-final: gmp mpfr mpc isl zlib libiconv binutils dir-prep
 	$(MAKE) -C $(PACKAGEDIR)/gcc STAGE=final
 endif
 
-gdb: mpfr zlib libiconv
+gdb: mpfr expat xz zlib libiconv
 	$(MAKE) -C $(PACKAGEDIR)/gdb
 
