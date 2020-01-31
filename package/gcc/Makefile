@@ -75,7 +75,10 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
-		CFLAGS="$(HOST_CFLAGS)" LDFLAGS="$(HOST_LDFLAGS)" $(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
+		CFLAGS="$(HOST_CFLAGS)" \
+		CXXFLAGS="$(HOST_CXXFLAGS)" \
+		LDFLAGS="$(HOST_LDFLAGS)" \
+			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 else
@@ -86,9 +89,10 @@ configure: extract
 		enable_gnu_indirect_function=yes \
 		default_gnu_indirect_function=yes \
 		CFLAGS="$(HOST_CFLAGS)" \
+		CXXFLAGS="$(HOST_CXXFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS)" \
 		CFLAGS_FOR_TARGET="$(TARGET_CFLAGS) $(GCC_DEBUG_CFLAGS)" \
-		CXXFLAGS_FOR_TARGET="$(TARGET_CFLAGS) $(GCC_DEBUG_CFLAGS)" \
+		CXXFLAGS_FOR_TARGET="$(TARGET_CXXFLAGS) $(GCC_DEBUG_CFLAGS)" \
 		LDFLAGS_FOR_TARGET="$(TARGET_LDFLAGS)" \
 		CC_FOR_TARGET="$(TOOLCHAIN_PREFIX)gcc" \
 		CXX_FOR_TARGET="$(TOOLCHAIN_PREFIX)g++" \
