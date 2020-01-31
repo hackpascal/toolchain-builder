@@ -6,9 +6,11 @@ export BUILDDIR:=$(TOPDIR)/build
 export PACKAGEDIR:=$(TOPDIR)/package
 
 export HOST_CFLAGS:=-ffunction-sections -fdata-sections
+export HOST_CXXFLAGS:=$(HOST_CFLAGS)
 export HOST_LDFLAGS:=-Wl,--gc-sections
 
 export TARGET_CFLAGS:=$(HOST_CFLAGS)
+export TARGET_CXXFLAGS:=$(HOST_CXXFLAGS)
 export TARGET_LDFLAGS:=$(HOST_LDFLAGS)
 
 export HOSTCC ?= gcc
