@@ -35,6 +35,7 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
+		ln -sf $(PACKAGE_SOURCE_DIR); \
 		acnewlib_cv_type_long_double=yes \
 		newlib_cv_ldbl_eq_dbl=yes \
 		CFLAGS="$(HOST_CFLAGS)" \
@@ -45,7 +46,7 @@ configure: extract
 		AS_FOR_TARGET="$(TOOLCHAIN_PREFIX)as" \
 		LD_FOR_TARGET="$(TOOLCHAIN_PREFIX)ld" \
 		RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" \
-			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 

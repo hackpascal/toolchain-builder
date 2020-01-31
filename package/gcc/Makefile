@@ -65,10 +65,11 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
+		ln -sf $(PACKAGE_SOURCE_DIR); \
 		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
 		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
-			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 else
@@ -76,6 +77,7 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
+		ln -sf $(PACKAGE_SOURCE_DIR); \
 		enable_gnu_indirect_function=yes \
 		default_gnu_indirect_function=yes \
 		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
@@ -90,7 +92,7 @@ configure: extract
 		AS_FOR_TARGET="$(TOOLCHAIN_PREFIX)as" \
 		LD_FOR_TARGET="$(TOOLCHAIN_PREFIX)ld"  \
 		RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" \
-			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 endif

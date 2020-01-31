@@ -45,6 +45,7 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
+		ln -sf $(PACKAGE_SOURCE_DIR); \
 		libc_cv_slibdir="/$(TARGET_LIB_DIR)" \
 		use_ldconfig=no \
 		libc_cv_ssp=no \
@@ -56,7 +57,7 @@ configure: extract
 		CFLAGS="$(TARGET_CFLAGS) $(GLIBC_DEBUG_CFLAGS)" \
 		CXXFLAGS="$(TARGET_CXXFLAGS) $(GLIBC_DEBUG_CFLAGS)" \
 		LDFLAGS="$(TARGET_LDFLAGS)" \
-			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 

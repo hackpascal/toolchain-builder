@@ -33,10 +33,11 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
+		ln -sf $(PACKAGE_SOURCE_DIR); \
 		CROSS_COMPILE="$(TOOLCHAIN_PREFIX)" \
 		CC="$(TOOLCHAIN_PREFIX)gcc" \
 		CFLAGS="$(TARGET_CFLAGS) $(MUSL_DEBUG_CFLAGS)" \
-			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 
