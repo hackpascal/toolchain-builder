@@ -5,7 +5,7 @@ export OUTPUTDIR:=$(TOPDIR)/output
 export BUILDDIR:=$(TOPDIR)/build
 export PACKAGEDIR:=$(TOPDIR)/package
 
-export HOST_CFLAGS:=-ffunction-sections -fdata-sections
+export HOST_CFLAGS:=-ffunction-sections -fdata-sections -fno-ident
 export HOST_CXXFLAGS:=$(HOST_CFLAGS)
 export HOST_LDFLAGS:=-Wl,--gc-sections
 
