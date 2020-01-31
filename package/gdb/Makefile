@@ -11,7 +11,7 @@ CONFIGURE_ARGS= \
 	--prefix=$(OUTPUT_PREFIX) \
 	--target=$(TARGET) \
 	$(if $(HOST),--host=$(HOST)) \
-	--disable-nls \
+	--enable-nls \
 	--with-system-zlib
 
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
@@ -51,7 +51,7 @@ build: configure
 
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
-		$(MAKE) -C $(PACKAGE_BUILD_DIR) install && \
+		$(MAKE) -C $(PACKAGE_BUILD_DIR) install-gdb && \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
 
