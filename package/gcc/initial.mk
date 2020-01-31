@@ -2,10 +2,15 @@
 CONFIGURE_ARGS += \
 	--disable-lto \
 	--disable-largefile \
-	--disable-shared \
-	--enable-languages=c \
 	--disable-nls \
+	--disable-shared \
 	--disable-bootstrap \
+	--disable-libgomp \
+	--disable-libquadmath \
+	--disable-libatomic \
+	--disable-libssp \
+	--disable-libsanitizer \
+	--enable-languages=c \
 	--with-newlib
 
 ifneq ($(LIBC_HEADERS),)

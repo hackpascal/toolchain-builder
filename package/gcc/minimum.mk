@@ -7,8 +7,13 @@ CONFIGURE_ARGS += \
 	--disable-nls \
 	--disable-shared \
 	--disable-bootstrap \
-	--enable-languages=c \
+	--disable-libgomp \
+	--disable-libquadmath \
+	--disable-libatomic \
+	--disable-libssp \
+	--disable-libsanitizer \
 	--disable-libgcc \
+	--enable-languages=c \
 	--without-headers \
 	--with-newlib
 

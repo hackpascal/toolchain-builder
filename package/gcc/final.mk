@@ -1,11 +1,16 @@
 
 CONFIGURE_ARGS += \
+	--enable-libatomic \
+	--enable-libssp \
+	--enable-libgomp \
 	--enable-lto \
 	--enable-plugins \
 	--enable-largefile \
 	--enable-shared \
 	--enable-static \
 	--enable-nls \
+	--enable-c99 \
+	--enable-checking=release \
 	--enable-libstdcxx-debug \
 	--enable-libstdcxx-time=yes \
 	--enable-languages=c,c++,lto \
