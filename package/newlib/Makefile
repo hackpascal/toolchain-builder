@@ -35,7 +35,17 @@ configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
 		cd $(PACKAGE_BUILD_DIR); \
-		acnewlib_cv_type_long_double=yes newlib_cv_ldbl_eq_dbl=yes CFLAGS="$(HOST_CFLAGS)" CFLAGS_FOR_TARGET="$(TARGET_CFLAGS) $(NEWLIB_DEBUG_CFLAGS)" CC_FOR_TARGET="$(TOOLCHAIN_PREFIX)gcc" CXX_FOR_TARGET="$(TOOLCHAIN_PREFIX)g++" AR_FOR_TARGET="$(TOOLCHAIN_PREFIX)ar" AS_FOR_TARGET="$(TOOLCHAIN_PREFIX)as" LD_FOR_TARGET="$(TOOLCHAIN_PREFIX)ld" RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" $(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
+		acnewlib_cv_type_long_double=yes \
+		newlib_cv_ldbl_eq_dbl=yes \
+		CFLAGS="$(HOST_CFLAGS)" \
+		CFLAGS_FOR_TARGET="$(TARGET_CFLAGS) $(NEWLIB_DEBUG_CFLAGS)" \
+		CC_FOR_TARGET="$(TOOLCHAIN_PREFIX)gcc" \
+		CXX_FOR_TARGET="$(TOOLCHAIN_PREFIX)g++" \
+		AR_FOR_TARGET="$(TOOLCHAIN_PREFIX)ar" \
+		AS_FOR_TARGET="$(TOOLCHAIN_PREFIX)as" \
+		LD_FOR_TARGET="$(TOOLCHAIN_PREFIX)ld" \
+		RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" \
+			$(PACKAGE_SOURCE_DIR)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 
