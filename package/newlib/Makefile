@@ -58,8 +58,7 @@ build: configure
 
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
-		($(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(BUILD_DIR)/newlib-libs || \
-		 $(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(BUILD_DIR)/newlib-libs) && \
+		$(MAKE) -j1 -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(BUILD_DIR)/newlib-libs && \
 		cp -a $(BUILD_DIR)/newlib-libs/$(TARGET)/* $(SYSROOT_PREFIX)/ && \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
