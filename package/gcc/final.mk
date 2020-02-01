@@ -1,8 +1,5 @@
 
 CONFIGURE_ARGS += \
-	--enable-libatomic \
-	--enable-libssp \
-	--enable-libgomp \
 	--enable-lto \
 	--enable-plugins \
 	--enable-largefile \
@@ -20,11 +17,20 @@ CONFIGURE_ARGS += \
 ifeq ($(LIBC),newlib)
 CONFIGURE_ARGS += \
 	--with-newlib \
+	--disable-libgomp \
 	--disable-thread \
 	--disable-tls
 else
 CONFIGURE_ARGS += \
+	--enable-libatomic \
+	--enable-libssp \
+	--enable-libgomp \
 	--enable-threads=posix \
 	--enable-tls
+endif
+
+ifneq ($(LIBC),glibc)
+CONFIGURE_ARGS += \
+	--disable-libsanitizer
 endif
 

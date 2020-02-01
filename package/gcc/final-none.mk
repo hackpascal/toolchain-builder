@@ -1,10 +1,6 @@
 
 CONFIGURE_ARGS += \
-	--disable-libgomp \
-	--disable-libquadmath \
-	--disable-libatomic \
 	--disable-libssp \
-	--disable-libsanitizer \
 	--disable-libstdc++-v3 \
 	--disable-tls \
 	--enable-lto \
