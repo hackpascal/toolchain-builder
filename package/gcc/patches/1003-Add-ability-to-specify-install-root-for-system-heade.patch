@@ -1,0 +1,89 @@
+From e72e1aa6dc43fb98ccb9acf8e6ab6bfb65eca678 Mon Sep 17 00:00:00 2001
+From: Weijie Gao <hackpascal@gmail.com>
+Date: Tue, 28 Jan 2020 19:51:42 +0800
+Subject: [PATCH 14/14] Add ability to specify install root for system header
+ directory
+
+---
+ Makefile.in      | 1 +
+ configure        | 1 +
+ configure.ac     | 2 ++
+ gcc/Makefile.in  | 2 +-
+ gcc/configure    | 1 +
+ gcc/configure.ac | 1 +
+ 6 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index b824e0a0c..cfa1bcd27 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -10983,6 +10983,7 @@ configure-gcc:
+ 		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
+ 	esac; \
+ 	module_srcdir=gcc; \
++	BUILD_TIME_INSTALL_DIR="@BUILD_TIME_INSTALL_DIR@" \
+ 	$(SHELL) \
+ 	  $$s/$$module_srcdir/configure \
+ 	  --srcdir=$${topdir}/$$module_srcdir \
+diff --git a/configure b/configure
+index 32ee91f94..b7a585e22 100755
+--- a/configure
++++ b/configure
+@@ -555,6 +555,7 @@ ac_unique_file="move-if-change"
+ enable_option_checking=no
+ ac_subst_vars='LTLIBOBJS
+ LIBOBJS
++BUILD_TIME_INSTALL_DIR
+ compare_exclusions
+ host_shared
+ stage2_werror_flag
+diff --git a/configure.ac b/configure.ac
+index 123774992..917238dfb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3523,3 +3523,5 @@ AC_CONFIG_FILES([Makefile],
+    extrasub_host="$extrasub_host"
+    extrasub_target="$extrasub_target"])
+ AC_OUTPUT
++
++AC_SUBST(BUILD_TIME_INSTALL_DIR)
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index f675e073e..73fbb6957 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -515,7 +515,7 @@ CROSS_SYSTEM_HEADER_DIR = @CROSS_SYSTEM_HEADER_DIR@
+ # The sed idiom for this is to repeat the search-and-replace until it doesn't match, using :a ... ta.
+ # Use single quotes here to avoid nested double- and backquotes, this
+ # macro is also used in a double-quoted context.
+-SYSTEM_HEADER_DIR = `echo @SYSTEM_HEADER_DIR@ | sed -e :a -e 's,[^/]*/\.\.\/,,' -e ta`
++SYSTEM_HEADER_DIR = `echo @BUILD_TIME_INSTALL_DIR@@SYSTEM_HEADER_DIR@ | sed -e :a -e 's,[^/]*/\.\.\/,,' -e ta`
+ 
+ # Control whether to run fixincludes.
+ STMP_FIXINC = @STMP_FIXINC@
+diff --git a/gcc/configure b/gcc/configure
+index 5dab9142e..e7ebfa8a2 100755
+--- a/gcc/configure
++++ b/gcc/configure
+@@ -815,6 +815,7 @@ LDFLAGS
+ CFLAGS
+ CC
+ GENINSRC
++BUILD_TIME_INSTALL_DIR
+ CROSS_SYSTEM_HEADER_DIR
+ TARGET_SYSTEM_ROOT_DEFINE
+ TARGET_SYSTEM_ROOT
+diff --git a/gcc/configure.ac b/gcc/configure.ac
+index e1fa8af5e..3cbbb9bfb 100644
+--- a/gcc/configure.ac
++++ b/gcc/configure.ac
+@@ -190,6 +190,7 @@ AC_ARG_WITH(sysroot,
+ AC_SUBST(TARGET_SYSTEM_ROOT)
+ AC_SUBST(TARGET_SYSTEM_ROOT_DEFINE)
+ AC_SUBST(CROSS_SYSTEM_HEADER_DIR)
++AC_SUBST(BUILD_TIME_INSTALL_DIR)
+ 
+ # Don't set gcc_gxx_include_dir to gxx_include_dir since that's only
+ # passed in by the toplevel make and thus we'd get different behavior
+-- 
+2.17.1
+
