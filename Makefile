@@ -4,6 +4,7 @@ export DLDIR:=$(TOPDIR)/dl
 export OUTPUTDIR:=$(TOPDIR)/output
 export BUILDDIR:=$(TOPDIR)/build
 export PACKAGEDIR:=$(TOPDIR)/package
+export SOURCEDIR:=$(BUILDDIR)/source
 
 export HOST_CFLAGS:=-ffunction-sections -fdata-sections -fno-ident
 export HOST_CXXFLAGS:=$(HOST_CFLAGS)
@@ -42,6 +43,10 @@ NATIVE_BUILD:=y
 endif
 endif
 
+ifeq ($(VARIANT),)
+export VARIANT:=generic
+endif
+
 export NATIVE_BUILD PREFIX_USE_GCC_ARCH
 
 WIN_HOST:=$(findstring mingw,$(HOST))
@@ -60,26 +65,26 @@ dirs:
 
 target: toolchain
 ifeq ($(strip $(NO_TARGET)),)
-	$(MAKE) -f build.mk BUILD_TYPE=target
+	$(MAKE) -f build.mk STAGE=target
 else
 	true
 endif
 
 toolchain:
 ifeq ($(NATIVE_BUILD),)
-	$(MAKE) -f build.mk BUILD_TYPE=toolchain
+	$(MAKE) -f build.mk STAGE=toolchain
 else
 	true
 endif
 
 target_%:
 ifeq ($(strip $(NO_TARGET)),)
-	$(MAKE) -f build.mk BUILD_TYPE=target $(@:target_%=%)
+	$(MAKE) -f build.mk STAGE=target $(@:target_%=%)
 endif
 
 toolchain_%:
 ifeq ($(NATIVE_BUILD),)
-	$(MAKE) -f build.mk BUILD_TYPE=toolchain $(@:toolchain_%=%)
+	$(MAKE) -f build.mk STAGE=toolchain $(@:toolchain_%=%)
 endif
 
 else

@@ -4,8 +4,8 @@ VERSION=1.1.24
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=https://www.musl-libc.org/releases/$(SOURCE_FILE)
 
-PACKAGE_SOURCE_DIR=$(BUILD_SOURCE_DIR)/$(NAME)-$(VERSION)
-PACKAGE_BUILD_DIR=$(BUILD_DIR)/$(NAME)-$(VERSION)
+PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
+PACKAGE_BUILD_DIR=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)
 
 CONFIGURE_ARGS= \
 	--prefix=/ \
@@ -24,7 +24,7 @@ download:
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
-		tar -zxf $(DLDIR)/$(SOURCE_FILE) -C $(BUILD_SOURCE_DIR) && \
+		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
@@ -37,7 +37,7 @@ configure: extract
 		CROSS_COMPILE="$(TOOLCHAIN_PREFIX)" \
 		CC="$(TOOLCHAIN_PREFIX)gcc" \
 		CFLAGS="$(TARGET_CFLAGS) $(MUSL_DEBUG_CFLAGS)" \
-			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 
@@ -49,10 +49,10 @@ build: configure
 
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
-		$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(SYSROOT_PREFIX) && \
+		$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(FINAL_SYSROOT_DIR) && \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
 
 force-install: build
-	$(MAKE) -C $(PACKAGE_BUILD_DIR) install
+	$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(FINAL_SYSROOT_DIR)
 

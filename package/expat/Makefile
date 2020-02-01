@@ -4,7 +4,7 @@ VERSION=2.2.9
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://github.com/libexpat/libexpat/releases/download/R_2_2_9/$(SOURCE_FILE)
 
-PACKAGE_SOURCE_DIR=$(HOST_SOURCE_DIR)/$(NAME)-$(VERSION)
+PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
 PACKAGE_BUILD_DIR=$(HOST_BUILD_DIR)/$(NAME)-$(VERSION)
 
 CONFIGURE_ARGS= \
@@ -23,7 +23,7 @@ download:
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
-		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(HOST_SOURCE_DIR) && \
+		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
@@ -35,7 +35,7 @@ configure: extract
 		ln -sf $(PACKAGE_SOURCE_DIR); \
 		CFLAGS="$(HOST_CFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS)" \
-			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 

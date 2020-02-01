@@ -4,7 +4,7 @@ VERSION=1.0.32
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://downloads.uclibc-ng.org/releases/$(VERSION)/$(SOURCE_FILE)
 
-PACKAGE_BUILD_DIR=$(BUILD_DIR)/$(NAME)-$(VERSION)
+PACKAGE_BUILD_DIR=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)
 
 ifeq ($(strip $(LIBC_DEBUG)),y)
 UCLIBC_DEBUG_CFLAGS:=-g3 -ggdb3 -gdwarf-4
@@ -19,7 +19,7 @@ download:
 extract: download
 	[ -f $(PACKAGE_BUILD_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
-		tar -Jxf $(DLDIR)/$(SOURCE_FILE) -C $(BUILD_DIR) && \
+		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(STAGE_BUILD_DIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_BUILD_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_BUILD_DIR)/.extracted \
 	)
@@ -47,22 +47,23 @@ configure: extract
 headers: configure
 	$(MAKE) -C $(PACKAGE_BUILD_DIR) PREFIX=$(LIBC_PRE_HEADER_DIR) install_headers
 	cp -a $(LIBC_PRE_HEADER_DIR)/include/* $(BUILD_SYSROOT)/include/
-	cp -a $(LIBC_PRE_HEADER_DIR)/include/* $(SYSROOT_PREFIX)/include/
+	cp -a $(LIBC_PRE_HEADER_DIR)/include/* $(FINAL_SYSROOT_DIR)/include/
 
 build: configure
 	[ -f $(PACKAGE_BUILD_DIR)/.built ] || ( \
-		($(MAKE) -C $(PACKAGE_BUILD_DIR) || \
-		$(MAKE) -C $(PACKAGE_BUILD_DIR)) && \
-		$(MAKE) -C $(PACKAGE_BUILD_DIR) hostutils && \
+		$(MAKE) -C $(PACKAGE_BUILD_DIR) all hostutils && \
 		touch $(PACKAGE_BUILD_DIR)/.built \
 	)
 
 install: build
-	$(MAKE) -C $(PACKAGE_BUILD_DIR) PREFIX=$(SYSROOT_PREFIX) install_runtime install_dev
-ifeq ($(BUILD_TYPE),toolchain)
-	mkdir -p $(OUTPUT_PREFIX)/bin
-	cp $(PACKAGE_BUILD_DIR)/utils/getconf.host $(OUTPUT_PREFIX)/bin/$(TARGET)-getconf
-	cp $(PACKAGE_BUILD_DIR)/utils/ldconfig.host $(OUTPUT_PREFIX)/bin/$(TARGET)-ldconfig
-	cp $(PACKAGE_BUILD_DIR)/utils/ldd.host $(OUTPUT_PREFIX)/bin/$(TARGET)-ldd
-endif
+	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
+		$(MAKE) -C $(PACKAGE_BUILD_DIR) PREFIX=$(FINAL_SYSROOT_DIR) install_runtime install_dev; \
+		if [ x"$(STAGE)" = xtoolchain ]; then \
+			mkdir -p $(FINAL_OUTPUT_DIR)/bin; \
+			cp $(PACKAGE_BUILD_DIR)/utils/getconf.host $(FINAL_OUTPUT_DIR)/bin/$(TARGET)-getconf; \
+			cp $(PACKAGE_BUILD_DIR)/utils/ldconfig.host $(FINAL_OUTPUT_DIR)/bin/$(TARGET)-ldconfig; \
+			cp $(PACKAGE_BUILD_DIR)/utils/ldd.host $(FINAL_OUTPUT_DIR)/bin/$(TARGET)-ldd; \
+		fi; \
+		touch $(PACKAGE_BUILD_DIR)/.installed \
+	)
 

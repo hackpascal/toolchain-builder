@@ -11,6 +11,6 @@ CONFIGURE_ARGS += \
 	--enable-static \
 	--enable-languages=c,c++,lto \
 	--with-newlib \
-	--with-build-sysroot=$(OUTPUT_PREFIX)/$(TARGET) \
+	--with-sysroot=$(SYSROOT_PREFIX) \
 	--with-native-system-header-dir=/include
 

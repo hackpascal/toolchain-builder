@@ -4,11 +4,11 @@ VERSION=7.5.0
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(NAME)-$(VERSION)/$(SOURCE_FILE)
 
-PACKAGE_SOURCE_DIR=$(BUILD_SOURCE_DIR)/$(NAME)-$(VERSION)
-PACKAGE_BUILD_DIR_COMMON=$(BUILD_DIR)/$(NAME)-$(VERSION)
+PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
+PACKAGE_BUILD_DIR_COMMON=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)
 
 CONFIGURE_ARGS= \
-	--prefix=$(OUTPUT_PREFIX) \
+	--prefix=$(BUILD_PREFIX) \
 	--target=$(TARGET) \
 	$(if $(HOST),--host=$(HOST)) \
 	--disable-multilib \
@@ -35,15 +35,15 @@ ifeq ($(strip $(LIBC_DEBUG)),y)
 GCC_DEBUG_CFLAGS:=-g3 -ggdb3 -gdwarf-4
 endif
 
-PACKAGE_BUILD_DIR=$(PACKAGE_BUILD_DIR_COMMON)-$(STAGE)
+PACKAGE_BUILD_DIR=$(PACKAGE_BUILD_DIR_COMMON)-$(GCC_STAGE)
 
 ifneq ($(LIBC),none)
-STAGE_MK=$(STAGE)
+GCC_STAGE_MK=$(GCC_STAGE)
 else
-STAGE_MK=$(STAGE)-none
+GCC_STAGE_MK=$(GCC_STAGE)-none
 endif
 
-include $(STAGE_MK).mk
+include $(GCC_STAGE_MK).mk
 
 
 all: install
@@ -55,12 +55,12 @@ download:
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
-		tar -Jxf $(DLDIR)/$(SOURCE_FILE) -C $(BUILD_SOURCE_DIR) && \
+		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
 
-ifeq ($(BUILD_TYPE),toolchain)
+ifeq ($(STAGE),toolchain)
 configure: extract
 	[ -f $(PACKAGE_BUILD_DIR)/.configured ] || ( \
 		mkdir -p $(PACKAGE_BUILD_DIR); \
@@ -69,7 +69,7 @@ configure: extract
 		CFLAGS="$(HOST_CFLAGS) $(LIBS_CFLAGS)" \
 		CXXFLAGS="$(HOST_CXXFLAGS) $(LIBS_CXXFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS) $(LIBS_LDFLAGS)" \
-			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 else
@@ -92,7 +92,8 @@ configure: extract
 		AS_FOR_TARGET="$(TOOLCHAIN_PREFIX)as" \
 		LD_FOR_TARGET="$(TOOLCHAIN_PREFIX)ld"  \
 		RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" \
-			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
+		BUILD_TIME_INSTALL_DIR="$(INSTALL_DIR)" \
+			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 endif
@@ -105,12 +106,12 @@ build: configure
 
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
-		$(MAKE) -C $(PACKAGE_BUILD_DIR) install && \
-		([ -d $(OUTPUT_PREFIX)/lib/gcc/$(TARGET)/lib ] && cp -a $(OUTPUT_PREFIX)/lib/gcc/$(TARGET)/lib64/* $(OUTPUT_PREFIX)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
-		([ -d $(OUTPUT_PREFIX)/lib/gcc/$(TARGET)/lib64 ] && cp -a $(OUTPUT_PREFIX)/lib/gcc/$(TARGET)/lib64/* $(OUTPUT_PREFIX)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
+		$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(INSTALL_DIR) && \
+		([ -d $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib ] && cp -a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/* $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
+		([ -d $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64 ] && cp -a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/* $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
 
 force-install: build
-	$(MAKE) -C $(PACKAGE_BUILD_DIR) install
+	$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(INSTALL_DIR)
 

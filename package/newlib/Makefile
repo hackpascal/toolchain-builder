@@ -4,8 +4,8 @@ VERSION=3.3.0
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=http://www.sourceware.org/pub/$(NAME)/$(NAME)-$(VERSION).tar.gz
 
-PACKAGE_SOURCE_DIR=$(BUILD_SOURCE_DIR)/$(NAME)-$(VERSION)
-PACKAGE_BUILD_DIR=$(BUILD_DIR)/$(NAME)-$(VERSION)
+PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
+PACKAGE_BUILD_DIR=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)
 
 CONFIGURE_ARGS= \
 	--prefix=/ \
@@ -26,7 +26,7 @@ download:
 extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
-		tar -zxf $(DLDIR)/$(SOURCE_FILE) -C $(BUILD_SOURCE_DIR) && \
+		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
@@ -46,7 +46,7 @@ configure: extract
 		AS_FOR_TARGET="$(TOOLCHAIN_PREFIX)as" \
 		LD_FOR_TARGET="$(TOOLCHAIN_PREFIX)ld" \
 		RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" \
-			$(PACKAGE_SOURCE_DIR:$(BUILD_SOURCE_DIR)/%=%)/configure $(CONFIGURE_ARGS) && \
+			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
 
@@ -58,8 +58,8 @@ build: configure
 
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
-		$(MAKE) -j1 -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(BUILD_DIR)/newlib-libs && \
-		cp -a $(BUILD_DIR)/newlib-libs/$(TARGET)/* $(SYSROOT_PREFIX)/ && \
+		$(MAKE) -j1 -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(STAGE_BUILD_DIR)/newlib-libs && \
+		cp -a $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/* $(FINAL_SYSROOT_DIR)/ && \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
 
