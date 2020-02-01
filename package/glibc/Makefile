@@ -1,6 +1,6 @@
 
 NAME=glibc
-VERSION=2.26
+VERSION=2.30
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
@@ -36,7 +36,6 @@ extract: download
 	[ -f $(PACKAGE_SOURCE_DIR)/.extracted ] || ( \
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
 		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
-		cp $(PACKAGE_SOURCE_DIR)/sysdeps/unix/sysv/linux/aarch64/pt-vfork.c $(PACKAGE_SOURCE_DIR)/sysdeps/unix/sysv/linux/arm/pt-vfork.c && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
@@ -72,7 +71,6 @@ headers: configure
 		install_root="$(LIBC_PRE_HEADER_DIR)" \
 		install-bootstrap-headers=yes \
 		install-headers
-	touch $(LIBC_PRE_HEADER_DIR)/include/gnu/stubs.h
 	cp -a $(LIBC_PRE_HEADER_DIR)/include/* $(BUILD_SYSROOT)/include/
 	cp -a $(LIBC_PRE_HEADER_DIR)/include/* $(FINAL_SYSROOT_DIR)/include/
 
