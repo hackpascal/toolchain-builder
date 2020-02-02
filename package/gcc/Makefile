@@ -1,6 +1,9 @@
 
 NAME=gcc
-VERSION=7.5.0
+GCC_VER_MAJOR=7
+GCC_VER_MINOR=5
+GCC_VER_PATCH=0
+VERSION=$(GCC_VER_MAJOR).$(GCC_VER_MINOR).$(GCC_VER_PATCH)
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(NAME)-$(VERSION)/$(SOURCE_FILE)
 
@@ -57,6 +60,7 @@ extract: download
 		mkdir -p $(PACKAGE_SOURCE_DIR); \
 		tar -xf $(DLDIR)/$(SOURCE_FILE) -C $(SOURCEDIR) && \
 		for f in $$(ls ./patches/*.patch ./patches/*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
+		for f in $$(ls ./patches-$(GCC_VER_MAJOR).$(GCC_VER_MINOR)/*.patch ./patches/-$(GCC_VER_MAJOR).$(GCC_VER_MINOR)*.diff); do patch -d $(PACKAGE_SOURCE_DIR) -p1 < $$f; done; \
 		touch $(PACKAGE_SOURCE_DIR)/.extracted \
 	)
 
