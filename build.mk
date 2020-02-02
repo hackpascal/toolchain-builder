@@ -42,8 +42,9 @@ endif
 
 export HOST_OUTPUT_PREFIX:=$(HOST_BUILD_DIR)/install
 
-ifeq ($(NATIVE_BUILD),)
 export TOOLCHAIN_BIN_DIR:=$(TARGET_OUTPUT_DIR)/toolchain/usr/bin
+
+ifeq ($(NATIVE_BUILD),)
 export TOOLCHAIN_PREFIX:=$(TOOLCHAIN_BIN_DIR)/$(TARGET)-
 else
 ifeq ($(PREFIX_USE_GCC_ARCH),y)
@@ -66,6 +67,15 @@ endif
 ifeq ($(STAGE),target)
 ifneq ($(WIN_HOST),)
 	-find $(FINAL_OUTPUT_DIR)/ -name '*.exe' -o -name '*.dll' | xargs $(HOST)-strip
+ifeq ($(STRIP_ALL),y)
+	-find $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET) -name '*.so*' -o -name '*.a' -o -name '*.o' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/libexec/gcc/$(TARGET) -name '*.so*' -o -name '*.a' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/lib -name '*.so*' -o -name '*.a' -o -name '*.o' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/lib64 -name '*.so*' -o -name '*.a' -o -name '*.o' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/bin | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/sbin | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/libexec | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+endif
 	$(TOPDIR)/symlinkconv.sh "$(FINAL_OUTPUT_DIR)"
 endif
 	find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e 's/-L$(subst /,\/,$(HOST_OUTPUT_PREFIX))\/lib//g' -e 's/$(subst /,\/,$(INSTALL_DIR))//g'
