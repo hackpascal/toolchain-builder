@@ -68,6 +68,7 @@ ifneq ($(WIN_HOST),)
 	-find $(FINAL_OUTPUT_DIR)/ -name '*.exe' -o -name '*.dll' | xargs $(HOST)-strip
 	$(TOPDIR)/symlinkconv.sh "$(FINAL_OUTPUT_DIR)"
 endif
+	find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e 's/-L$(subst /,\/,$(HOST_OUTPUT_PREFIX))\/lib//g' -e 's/$(subst /,\/,$(INSTALL_DIR))//g'
 endif
 
 gmp:
