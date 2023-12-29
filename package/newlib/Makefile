@@ -17,6 +17,45 @@ ifeq ($(strip $(LIBC_DEBUG)),y)
 NEWLIB_DEBUG_CFLAGS:=-g3 -ggdb3 -gdwarf-4
 endif
 
+ifeq ($(strip $(LIBC_NANO)),y)
+CONFIGURE_ARGS += \
+	--enable-newlib-reent-small \
+	--enable-newlib-retargetable-locking \
+	--disable-newlib-fvwrite-in-streamio \
+	--disable-newlib-fseek-optimization \
+	--disable-newlib-wide-orient \
+	--disable-newlib-unbuf-stream-opt \
+	--disable-nls \
+	--enable-newlib-nano-malloc \
+	--enable-lite-exit \
+	--enable-newlib-global-atexit
+#	--disable-newlib-supplied-syscalls
+
+LIBC_NANO_RENAME := \
+	cp -f $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/lib/libc.a $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/lib/libc_nano.a && \
+	cp -f $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/lib/libg.a $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/lib/libg_nano.a && \
+	cp -f $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/lib/librdimon.a $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/lib/librdimon_nano.a &&
+
+else
+CONFIGURE_ARGS += \
+	--disable-newlib-supplied-syscalls \
+	--disable-nls \
+	--enable-newlib-io-long-long \
+	--enable-newlib-io-c99-formats \
+	--enable-newlib-register-fini \
+	--enable-newlib-retargetable-locking
+endif
+
+ifneq ($(LIBC_USE_SOFT_FLOAT),y)
+CONFIGURE_ARGS += \
+	--enable-newlib-io-long-double
+
+ifeq ($(strip $(LIBC_NANO)),y)
+CONFIGURE_ARGS += \
+	--enable-newlib-nano-formatted-io
+endif
+endif
+
 all: install
 	true
 
@@ -46,6 +85,7 @@ configure: extract
 		AS_FOR_TARGET="$(TOOLCHAIN_PREFIX)as" \
 		LD_FOR_TARGET="$(TOOLCHAIN_PREFIX)ld" \
 		RANLIB_FOR_TARGET="$(TOOLCHAIN_PREFIX)ranlib" \
+		READELF_FOR_TARGET="$(TOOLCHAIN_PREFIX)readelf" \
 			$(PACKAGE_SOURCE_DIR:$(SOURCEDIR)/%=%)/configure $(CONFIGURE_ARGS) && \
 		touch $(PACKAGE_BUILD_DIR)/.configured \
 	)
@@ -56,12 +96,22 @@ build: configure
 		touch $(PACKAGE_BUILD_DIR)/.built \
 	)
 
+ifeq ($(strip $(LIBC_NANO)),y)
+install: build
+	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
+		$(MAKE) -j1 -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(STAGE_BUILD_DIR)/newlib-libs && \
+		$(LIBC_NANO_RENAME) \
+		cp -a $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/* $(FINAL_SYSROOT_DIR)/ && \
+		touch $(PACKAGE_BUILD_DIR)/.installed \
+	)
+else
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
 		$(MAKE) -j1 -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(STAGE_BUILD_DIR)/newlib-libs && \
 		cp -a $(STAGE_BUILD_DIR)/newlib-libs/$(TARGET)/* $(FINAL_SYSROOT_DIR)/ && \
 		touch $(PACKAGE_BUILD_DIR)/.installed \
 	)
+endif
 
 force-install: build
 	$(MAKE) -C $(PACKAGE_BUILD_DIR) install

@@ -46,6 +46,16 @@ else
 GCC_STAGE_MK=$(GCC_STAGE)-none
 endif
 
+ifeq ($(strip $(LIBC_NANO)),y)
+TARGET_CXXFLAGS += -fno-exceptions
+
+ifeq ($(GCC_STAGE),final)
+LIBC_NANO_RENAME := \
+	cp -f $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/libstdc++.a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/libstdc++_nano.a && \
+	cp -f $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/libsupc++.a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/libsupc++_nano.a &&
+endif
+endif
+
 include $(GCC_STAGE_MK).mk
 
 
@@ -111,6 +121,7 @@ build: configure
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
 		$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(INSTALL_DIR) && \
+		$(LIBC_NANO_RENAME) \
 		([ -d $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib ] && cp -a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/* $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
 		([ -d $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64 ] && cp -a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/* $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
 		sed -i 's/$(subst /,\/,$(INSTALL_DIR))//g' $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/install-tools/mkheaders.conf && \

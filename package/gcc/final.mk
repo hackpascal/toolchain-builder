@@ -9,7 +9,6 @@ CONFIGURE_ARGS += \
 	--enable-c99 \
 	--enable-checking=release \
 	--enable-libstdcxx-debug \
-	--enable-libstdcxx-time=yes \
 	--enable-languages=c,c++,lto \
 	--with-sysroot=$(SYSROOT_PREFIX) \
 	--with-native-system-header-dir=/include
@@ -20,13 +19,19 @@ CONFIGURE_ARGS += \
 	--disable-libgomp \
 	--disable-thread \
 	--disable-tls
+
+ifeq ($(strip $(LIBC_NANO)),y)
+CONFIGURE_ARGS += \
+	--disable-libstdcxx-time
+endif
 else
 CONFIGURE_ARGS += \
 	--enable-libatomic \
 	--enable-libssp \
 	--enable-libgomp \
 	--enable-threads=posix \
-	--enable-tls
+	--enable-tls \
+	--enable-libstdcxx-time=yes
 endif
 
 ifneq ($(LIBC),glibc)

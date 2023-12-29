@@ -59,6 +59,13 @@ ifneq ($(filter uclibc-ng glibc,$(LIBC)),)
 export LIBC_HEADERS:=$(LIBC)-headers
 endif
 
+ifneq ($(LIBC),newlib)
+LINUX_HEADERS_DEP := linux-headers
+DIR_PREP_DEP :=
+else
+LINUX_HEADERS_DEP :=
+DIR_PREP_DEP := dir-prep
+endif
 
 all: gcc-final gdb
 ifneq ($(TARGET),$(PROGRAM_PREFIX))
@@ -120,7 +127,7 @@ linux-headers: dir-prep
 	$(MAKE) -C $(PACKAGEDIR)/linux-kernel headers
 
 ifeq ($(STAGE),toolchain)
-$(LIBC): linux-headers gcc-initial
+$(LIBC): $(LINUX_HEADERS_DEP) $(DIR_PREP_DEP) gcc-initial
 	$(MAKE) -C $(PACKAGEDIR)/$(LIBC)
 
 ifneq ($(LIBC_HEADERS),)
@@ -134,7 +141,7 @@ endif
 gcc-initial: gmp mpfr mpc isl zlib libiconv binutils $(LIBC_HEADERS)
 	$(MAKE) -C $(PACKAGEDIR)/gcc GCC_STAGE=initial
 else
-$(LIBC): linux-headers
+$(LIBC): $(LINUX_HEADERS_DEP) $(DIR_PREP_DEP)
 	$(MAKE) -C $(PACKAGEDIR)/$(LIBC)
 endif
 
