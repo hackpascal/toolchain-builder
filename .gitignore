@@ -7,3 +7,5 @@
 *.rej
 *.orig
 /config.guess
+
+/.vscode
