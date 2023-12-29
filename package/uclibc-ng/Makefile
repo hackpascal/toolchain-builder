@@ -1,6 +1,6 @@
 
 NAME=uClibc-ng
-VERSION=1.0.32
+VERSION=1.0.45
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://downloads.uclibc-ng.org/releases/$(VERSION)/$(SOURCE_FILE)
 
@@ -43,6 +43,7 @@ configure: extract
 	else \
 		mv $(PACKAGE_BUILD_DIR)/tmp.config $(PACKAGE_BUILD_DIR)/.config; \
 	fi
+	make -C $(PACKAGE_BUILD_DIR) oldconfig
 
 headers: configure
 	$(MAKE) -C $(PACKAGE_BUILD_DIR) PREFIX=$(LIBC_PRE_HEADER_DIR) install_headers

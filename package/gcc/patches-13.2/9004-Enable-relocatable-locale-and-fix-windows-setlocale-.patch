@@ -1,63 +1,70 @@
-From 3ba2d7cc446d2cf9b6274185806ef2abbefa16d8 Mon Sep 17 00:00:00 2001
+From 2a2ec35150741be592bbe1f1382b14eddcdc8c11 Mon Sep 17 00:00:00 2001
 From: Weijie Gao <hackpascal@gmail.com>
-Date: Thu, 30 Jan 2020 21:19:16 +0800
-Subject: [PATCH] Enable relocatable locale
+Date: Thu, 30 Jan 2020 23:09:57 +0800
+Subject: Enable relocatable locale and fix windows setlocale issue
 
 ---
- gdb/main.c             |  15 ++-
- include/intl-reloc.h   |  19 +++
- libiberty/Makefile.in  |  13 +-
- libiberty/intl-reloc.c | 292 +++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 336 insertions(+), 3 deletions(-)
+ gcc/intl.cc            |  20 ++-
+ include/intl-reloc.h   |  20 +++
+ libcpp/init.cc         |  11 +-
+ libiberty/Makefile.in  |  17 ++-
+ libiberty/intl-reloc.c | 315 +++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 378 insertions(+), 5 deletions(-)
  create mode 100644 include/intl-reloc.h
  create mode 100644 libiberty/intl-reloc.c
 
-diff --git a/gdb/main.c b/gdb/main.c
-index 2da39f8..69a019a 100644
---- a/gdb/main.c
-+++ b/gdb/main.c
-@@ -57,6 +57,8 @@
- #include "observable.h"
- #include "serial.h"
+diff --git a/gcc/intl.cc b/gcc/intl.cc
+index 15bbb1acd..1e5fe308f 100644
+--- a/gcc/intl.cc
++++ b/gcc/intl.cc
+@@ -26,6 +26,8 @@ along with GCC; see the file COPYING3.  If not see
+ #include <langinfo.h>
+ #endif
  
 +#include <intl-reloc.h>
 +
- /* The selected interpreter.  */
- std::string interpreter_p;
+ /* Opening quotation mark for diagnostics.  */
+ const char *open_quote = "'";
  
-@@ -653,6 +655,10 @@ captured_main_1 (struct captured_main_args *context)
-   if (no_color != nullptr && *no_color != '\0')
-     cli_styling = false;
- 
+@@ -48,16 +50,30 @@ bool locale_utf8 = false;
+ void
+ gcc_init_libintl (void)
+ {
 +#ifdef ENABLE_NLS
 +  const char *localedir, *codeset;
 +#endif
 +
- #ifdef HAVE_USEFUL_SBRK
-   /* Set this before constructing scoped_command_stats.  */
-   lim_at_start = (char *) sbrk (0);
-@@ -667,7 +673,14 @@ captured_main_1 (struct captured_main_args *context)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_CTYPE, "");
+   setlocale (LC_MESSAGES, "");
+ #else
+-  setlocale (LC_ALL, "");
++  adjust_locale();
  #endif
- #ifdef ENABLE_NLS
--  bindtextdomain (PACKAGE, LOCALEDIR);
++#ifdef ENABLE_NLS
 +  localedir = get_locale_path(LOCALEDIR);
 +  codeset = find_codeset();
 +
-+  bindtextdomain (PACKAGE, localedir);
++  (void) bindtextdomain ("gcc", localedir);
 +
 +  if (codeset)
-+    bind_textdomain_codeset(PACKAGE, codeset);
++    (void) bind_textdomain_codeset("gcc", codeset);
+ 
+-  (void) bindtextdomain ("gcc", LOCALEDIR);
+   (void) textdomain ("gcc");
+ 
++  locale_utf8 = set_locale_utf8(locale_utf8, codeset);
++#endif
 +
-   textdomain (PACKAGE);
- #endif
+   /* Opening quotation mark.  */
+   open_quote = _("`");
  
 diff --git a/include/intl-reloc.h b/include/intl-reloc.h
 new file mode 100644
-index 0000000..e9c93fc
+index 000000000..2c06f1a2e
 --- /dev/null
 +++ b/include/intl-reloc.h
-@@ -0,0 +1,19 @@
+@@ -0,0 +1,20 @@
 +#ifndef _RELOCATE_H_
 +#define _RELOCATE_H_
 +
@@ -70,6 +77,7 @@ index 0000000..e9c93fc
 +const char *get_locale_path(const char *path);
 +const char *find_codeset(void);
 +void adjust_locale(void);
++bool set_locale_utf8(bool origval, const char *codeset);
 +
 +#ifdef __cplusplus
 +}
@@ -77,11 +85,58 @@ index 0000000..e9c93fc
 +
 +#endif /* _RELOCATE_H_ */
 +
+diff --git a/libcpp/init.cc b/libcpp/init.cc
+index c508f0611..165cebed4 100644
+--- a/libcpp/init.cc
++++ b/libcpp/init.cc
+@@ -26,6 +26,8 @@ along with this program; see the file COPYING3.  If not see
+ #include "localedir.h"
+ #include "filenames.h"
+ 
++#include <intl-reloc.h>
++
+ #ifndef ENABLE_CANONICAL_SYSTEM_HEADERS
+ #ifdef HAVE_DOS_BASED_FILE_SYSTEM
+ #define ENABLE_CANONICAL_SYSTEM_HEADERS 1
+@@ -167,6 +169,9 @@ cpp_set_lang (cpp_reader *pfile, enum c_lang lang)
+ static void
+ init_library (void)
+ {
++#ifdef ENABLE_NLS
++  const char *localedir, *codeset;
++#endif
+   static int initialized = 0;
+ 
+   if (! initialized)
+@@ -181,7 +186,11 @@ init_library (void)
+       init_trigraph_map ();
+ 
+ #ifdef ENABLE_NLS
+-       (void) bindtextdomain (PACKAGE, LOCALEDIR);
++       localedir = get_locale_path(LOCALEDIR);
++       codeset = find_codeset();
++       (void) bindtextdomain (PACKAGE, localedir);
++       if (codeset)
++         (void) bind_textdomain_codeset(PACKAGE, codeset);
+ #endif
+     }
+ }
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index f9fbba2..927e65a 100644
+index 72608f3e4..9789a0a38 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
-@@ -161,7 +161,7 @@ CFILES = alloca.c argv.c asprintf.c atexit.c				\
+@@ -63,6 +63,10 @@ PERL = @PERL@
+ PICFLAG = @PICFLAG@
+ NOASANFLAG = @NOASANFLAG@
+ 
++# Variables for version information.
++BASEVER     := $(srcdir)/BASE-VER  # 4.x.y
++version     := $(shell cat $(BASEVER))
++
+ MAKEOVERRIDES =
+ 
+ TARGETLIB = ./libiberty.a
+@@ -161,7 +165,7 @@ CFILES = alloca.c argv.c asprintf.c atexit.c				\
  	 vsnprintf.c vsprintf.c						\
  	waitpid.c							\
  	xasprintf.c xatexit.c xexit.c xmalloc.c xmemdup.c xstrdup.c	\
@@ -90,34 +145,34 @@ index f9fbba2..927e65a 100644
  
  # These are always included in the library.  The first four are listed
  # first and by compile time to optimize parallel builds.
-@@ -198,7 +198,7 @@ REQUIRED_OFILES =							\
+@@ -198,7 +202,7 @@ REQUIRED_OFILES =							\
  	./xasprintf.$(objext) ./xatexit.$(objext) ./xexit.$(objext)	\
  	./xmalloc.$(objext) ./xmemdup.$(objext) ./xstrdup.$(objext)	\
  	./xstrerror.$(objext) ./xstrndup.$(objext)			\
 -	./xvasprintf.$(objext)
-+	./xvasprintf.$(objext) intl-reloc.$(objext)
++	./xvasprintf.$(objext) ./intl-reloc.$(objext)
  
  # These are all the objects that configure may add to the library via
  # $funcs or EXTRA_OFILES.  This list exists here only for "make
-@@ -1771,3 +1771,12 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
+@@ -1770,3 +1774,12 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
  	  $(COMPILE.c) $(PICFLAG) $(NOASANFLAG) $(srcdir)/xvasprintf.c -o noasan/$@; \
  	else true; fi
  	$(COMPILE.c) $(srcdir)/xvasprintf.c $(OUTPUT_OPTION)
 +
 +./intl-reloc.$(objext): $(srcdir)/intl-reloc.c config.h
 +	if [ x"$(PICFLAG)" != x ]; then \
-+	  $(COMPILE.c) $(PICFLAG) $(srcdir)/intl-reloc.c -o pic/$@; \
++	  $(COMPILE.c) $(PICFLAG) -DTARGET='"@target_alias@"' -DTARGET_VERSION=\"$(version)\" $(srcdir)/intl-reloc.c -o pic/$@; \
 +	else true; fi
 +	if [ x"$(NOASANFLAG)" != x ]; then \
-+	  $(COMPILE.c) $(PICFLAG) $(NOASANFLAG) $(srcdir)/intl-reloc.c -o noasan/$@; \
++	  $(COMPILE.c) $(PICFLAG) $(NOASANFLAG) -DTARGET='"@target_alias@"' -DTARGET_VERSION=\"$(version)\" $(srcdir)/intl-reloc.c -o noasan/$@; \
 +	else true; fi
-+	$(COMPILE.c) $(srcdir)/intl-reloc.c $(OUTPUT_OPTION)
++	$(COMPILE.c) -DTARGET='"@target_alias@"' -DTARGET_VERSION=\"$(version)\" $(srcdir)/intl-reloc.c $(OUTPUT_OPTION)
 diff --git a/libiberty/intl-reloc.c b/libiberty/intl-reloc.c
 new file mode 100644
-index 0000000..b9b10c2
+index 000000000..b42ec98db
 --- /dev/null
 +++ b/libiberty/intl-reloc.c
-@@ -0,0 +1,292 @@
+@@ -0,0 +1,315 @@
 +
 +#if defined(__MINGW32__) || defined(__MINGW64__)
 +#include <windows.h>
@@ -260,6 +315,14 @@ index 0000000..b9b10c2
 +
 +	setlocale(LC_ALL, localename);
 +}
++
++bool set_locale_utf8(bool origval, const char *codeset)
++{
++	if (!strcmp(codeset, "CP65001") || !strcasecmp(codeset, "utf-8") || !strcasecmp(codeset, "utf8"))
++		return true;
++
++	return origval;
++}
 +#else
 +static char *exe_full_path(void)
 +{
@@ -319,6 +382,11 @@ index 0000000..b9b10c2
 +{
 +	setlocale(LC_ALL, "");
 +}
++
++bool set_locale_utf8(bool origval, const char *codeset)
++{
++	return origval;
++}
 +#endif
 +
 +static char *back_delim(char *path, int n)
@@ -345,6 +413,7 @@ index 0000000..b9b10c2
 +	return path + off;
 +}
 +
++static const char str_libexec_gcc_target_version[] = "/libexec/gcc/" TARGET "/" TARGET_VERSION;
 +static const char str_bin[] = "/bin";
 +static const char str_share_locale[] = "/share/locale";
 +
@@ -381,6 +450,15 @@ index 0000000..b9b10c2
 +		return strdup(str_share_locale);
 +
 +	*d = 0;
++
++	d = back_delim(self_path, 4);
++	if (d) {
++		if (!strcasecmp(d, str_libexec_gcc_target_version)) {
++			relocated_locale = check_locale_path(self_path, d);
++			if (relocated_locale)
++				goto done;
++		}
++	}
 +
 +	d = back_delim(self_path, 1);
 +	if (d) {

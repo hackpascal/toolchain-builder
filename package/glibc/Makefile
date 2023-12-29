@@ -1,6 +1,6 @@
 
 NAME=glibc
-VERSION=2.30
+VERSION=2.38
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
@@ -15,6 +15,7 @@ CONFIGURE_ARGS= \
 	--without-gd \
 	--without-cvs \
 	--enable-add-ons \
+	--enable-crypt \
 	--with-headers=$(BUILD_SYSROOT)/include
 
 ifeq ($(strip $(LIBC_USE_SOFT_FLOAT)),y)
@@ -73,6 +74,7 @@ headers: configure
 		install-headers
 	cp -a $(LIBC_PRE_HEADER_DIR)/include/* $(BUILD_SYSROOT)/include/
 	cp -a $(LIBC_PRE_HEADER_DIR)/include/* $(FINAL_SYSROOT_DIR)/include/
+	touch $(FINAL_SYSROOT_DIR)/include/gnu/stubs.h
 
 install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \

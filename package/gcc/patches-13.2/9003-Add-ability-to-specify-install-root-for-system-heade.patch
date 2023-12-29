@@ -1,0 +1,88 @@
+From 5bb8e0733bf6c6d112b6e3a9728c4d0c2f6c0011 Mon Sep 17 00:00:00 2001
+From: Weijie Gao <hackpascal@gmail.com>
+Date: Fri, 31 Jan 2020 00:36:50 +0800
+Subject: Add ability to specify install root for system header directory
+
+---
+ Makefile.in      | 1 +
+ configure        | 1 +
+ configure.ac     | 2 ++
+ gcc/Makefile.in  | 2 +-
+ gcc/configure    | 1 +
+ gcc/configure.ac | 1 +
+ 6 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 06a9398e1..c4ac7f879 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -12012,6 +12012,7 @@ configure-gcc:
+ 		sed -e 's,\./,,g' -e 's,[^/]*/,../,g' `$(srcdir) ;; \
+ 	esac; \
+ 	module_srcdir=gcc; \
++	BUILD_TIME_INSTALL_DIR="@BUILD_TIME_INSTALL_DIR@" \
+ 	$(SHELL) \
+ 	  $$s/$$module_srcdir/configure \
+ 	  --srcdir=$${topdir}/$$module_srcdir \
+diff --git a/configure b/configure
+index 117a7ef23..cc0fab4c7 100755
+--- a/configure
++++ b/configure
+@@ -586,6 +586,7 @@ ac_unique_file="move-if-change"
+ enable_option_checking=no
+ ac_subst_vars='LTLIBOBJS
+ LIBOBJS
++BUILD_TIME_INSTALL_DIR
+ compare_exclusions
+ stage2_werror_flag
+ stage1_checking
+diff --git a/configure.ac b/configure.ac
+index b3e9bbd2a..5379074c8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3818,3 +3818,5 @@ AC_CONFIG_FILES([Makefile],
+    extrasub_host="$extrasub_host"
+    extrasub_target="$extrasub_target"])
+ AC_OUTPUT
++
++AC_SUBST(BUILD_TIME_INSTALL_DIR)
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index 775aaa1b3..163ad05d1 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -547,7 +547,7 @@ endif
+ SYSTEM_HEADER_DIR = `echo @SYSTEM_HEADER_DIR@ | sed -e :a -e 's,[^/]*/\.\.\/,,' -e ta`
+ 
+ # Path to the system headers on the build machine.
+-BUILD_SYSTEM_HEADER_DIR = `echo @BUILD_SYSTEM_HEADER_DIR@ | sed -e :a -e 's,[^/]*/\.\.\/,,' -e ta`
++BUILD_SYSTEM_HEADER_DIR = `echo @BUILD_TIME_INSTALL_DIR@@BUILD_SYSTEM_HEADER_DIR@ | sed -e :a -e 's,[^/]*/\.\.\/,,' -e ta`
+ 
+ # Control whether to run fixincludes.
+ STMP_FIXINC = @STMP_FIXINC@
+diff --git a/gcc/configure b/gcc/configure
+index c7b26d192..57a5bdfc1 100755
+--- a/gcc/configure
++++ b/gcc/configure
+@@ -876,6 +876,7 @@ LDFLAGS
+ CFLAGS
+ CC
+ GENINSRC
++BUILD_TIME_INSTALL_DIR
+ CROSS_SYSTEM_HEADER_DIR
+ TARGET_SYSTEM_ROOT_DEFINE
+ TARGET_SYSTEM_ROOT
+diff --git a/gcc/configure.ac b/gcc/configure.ac
+index 09082e8cc..49d417a0d 100644
+--- a/gcc/configure.ac
++++ b/gcc/configure.ac
+@@ -190,6 +190,7 @@ AC_ARG_WITH(sysroot,
+ AC_SUBST(TARGET_SYSTEM_ROOT)
+ AC_SUBST(TARGET_SYSTEM_ROOT_DEFINE)
+ AC_SUBST(CROSS_SYSTEM_HEADER_DIR)
++AC_SUBST(BUILD_TIME_INSTALL_DIR)
+ 
+ # Don't set gcc_gxx_include_dir to gxx_include_dir since that's only
+ # passed in by the toplevel make and thus we'd get different behavior
+-- 
+2.17.1
+

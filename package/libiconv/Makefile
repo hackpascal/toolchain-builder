@@ -1,6 +1,6 @@
 
 NAME=libiconv
-VERSION=1.16
+VERSION=1.17
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 

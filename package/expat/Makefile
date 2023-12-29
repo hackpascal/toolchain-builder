@@ -1,8 +1,8 @@
 
 NAME=expat
-VERSION=2.2.9
+VERSION=2.5.0
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
-URL=https://github.com/libexpat/libexpat/releases/download/R_2_2_9/$(SOURCE_FILE)
+URL=https://github.com/libexpat/libexpat/releases/download/R_2_5_0/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
 PACKAGE_BUILD_DIR=$(HOST_BUILD_DIR)/$(NAME)-$(VERSION)

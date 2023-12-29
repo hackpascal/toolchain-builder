@@ -1,6 +1,6 @@
 
 NAME=gdb
-VERSION=8.3.1
+VERSION=14.1
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 
@@ -12,7 +12,8 @@ CONFIGURE_ARGS= \
 	--target=$(TARGET) \
 	$(if $(HOST),--host=$(HOST)) \
 	--enable-nls \
-	--with-system-zlib
+	--enable-64-bit-bfd \
+	--disable-sim
 
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
 LIBS_CXXFLAGS := $(LIBS_CFLAGS)

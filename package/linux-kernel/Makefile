@@ -1,6 +1,6 @@
 
 NAME=linux
-VERSION=5.4.15
+VERSION=6.6.8
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://cdn.kernel.org/pub/linux/kernel/v5.x/$(SOURCE_FILE)
 

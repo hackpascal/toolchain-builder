@@ -17,6 +17,8 @@ CONFIGURE_ARGS= \
 	--enable-ld \
 	--enable-lto \
 	--enable-gold \
+	--enable-plugins \
+	--enable-deterministic-archives \
 	--with-sysroot=$(SYSROOT_PREFIX)
 
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include

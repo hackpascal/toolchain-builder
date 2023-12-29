@@ -1,6 +1,6 @@
 
 NAME=musl
-VERSION=1.1.24
+VERSION=1.2.4
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=https://www.musl-libc.org/releases/$(SOURCE_FILE)
 

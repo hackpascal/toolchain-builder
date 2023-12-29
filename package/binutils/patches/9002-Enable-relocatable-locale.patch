@@ -12,40 +12,40 @@ Subject: [PATCH] Enable relocatable locale
  binutils/elfedit.c     |  21 ++-
  binutils/nm.c          |  21 ++-
  binutils/objcopy.c     |  22 ++-
- binutils/objdump.c     |  20 ++-
+ binutils/objdump.c     |  19 +++
  binutils/readelf.c     |  21 ++-
  binutils/size.c        |  21 ++-
  binutils/srconv.c      |  21 ++-
- binutils/strings.c     |  20 ++-
+ binutils/strings.c     |  21 ++-
  binutils/sysdump.c     |  21 ++-
  binutils/windmc.c      |  21 ++-
  binutils/windres.c     |  21 ++-
  gas/as.c               |  21 ++-
  gold/dwp.cc            |  20 ++-
  gold/main.cc           |  20 ++-
- gprof/gprof.c          |  20 ++-
+ gprof/gprof.c          |  19 ++-
  include/intl-reloc.h   |  19 +++
  ld/ldmain.c            |  21 ++-
  libiberty/Makefile.in  |  13 +-
  libiberty/intl-reloc.c | 302 +++++++++++++++++++++++++++++++++++++++++
- 24 files changed, 730 insertions(+), 43 deletions(-)
+ 24 files changed, 732 insertions(+), 40 deletions(-)
  create mode 100644 include/intl-reloc.h
  create mode 100644 libiberty/intl-reloc.c
 
 diff --git a/binutils/addr2line.c b/binutils/addr2line.c
-index 8a77c473..4f65fb3e 100644
+index b07302dd..92cdad5b 100644
 --- a/binutils/addr2line.c
 +++ b/binutils/addr2line.c
-@@ -38,6 +38,8 @@
- #include "bucomm.h"
+@@ -39,6 +39,8 @@
  #include "elf-bfd.h"
+ #include "safe-ctype.h"
  
 +#include <intl-reloc.h>
 +
- static bfd_boolean unwind_inlines;	/* -i, unwind inlined functions. */
- static bfd_boolean with_addresses;	/* -a, show addresses.  */
- static bfd_boolean with_functions;	/* -f, show function names.  */
-@@ -428,6 +430,9 @@ main (int argc, char **argv)
+ static bool unwind_inlines;	/* -i, unwind inlined functions. */
+ static bool with_addresses;	/* -a, show addresses.  */
+ static bool with_functions;	/* -f, show function names.  */
+@@ -496,13 +498,28 @@ main (int argc, char **argv)
    const char *section_name;
    char *target;
    int c;
@@ -53,12 +53,10 @@ index 8a77c473..4f65fb3e 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -435,8 +440,20 @@ main (int argc, char **argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -79,19 +77,19 @@ index 8a77c473..4f65fb3e 100644
    program_name = *argv;
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/ar.c b/binutils/ar.c
-index a65dd62f..cc6a1377 100644
+index 0c6ccf90..6756a50d 100644
 --- a/binutils/ar.c
 +++ b/binutils/ar.c
 @@ -36,6 +36,8 @@
- #include "plugin-api.h"
  #include "plugin.h"
+ #include "ansidecl.h"
  
 +#include <intl-reloc.h>
 +
  #ifdef __GO32___
  #define EXT_NAME_LEN 3		/* Bufflen of addition to name if it's MS-DOS.  */
  #else
-@@ -686,6 +688,9 @@ main (int argc, char **argv)
+@@ -716,13 +718,28 @@ main (int argc, char **argv)
    int file_count;
    char *inarch_filename;
    int i;
@@ -99,12 +97,10 @@ index a65dd62f..cc6a1377 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -693,8 +698,20 @@ main (int argc, char **argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -125,7 +121,7 @@ index a65dd62f..cc6a1377 100644
    program_name = argv[0];
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/coffdump.c b/binutils/coffdump.c
-index 589bb403..a1d2bc41 100644
+index a88edb06..c4313fbc 100644
 --- a/binutils/coffdump.c
 +++ b/binutils/coffdump.c
 @@ -33,6 +33,8 @@
@@ -137,7 +133,7 @@ index 589bb403..a1d2bc41 100644
  static int atnl;
  
  static void tab (int);
-@@ -489,6 +491,9 @@ main (int ac, char **av)
+@@ -486,13 +488,28 @@ main (int ac, char **av)
        { "version", no_argument, 0, 'V' },
        { NULL, no_argument, 0, 0 }
      };
@@ -145,12 +141,10 @@ index 589bb403..a1d2bc41 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -496,8 +501,20 @@ main (int ac, char **av)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -171,19 +165,19 @@ index 589bb403..a1d2bc41 100644
    program_name = av[0];
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/dlltool.c b/binutils/dlltool.c
-index cd2ff243..838325b6 100644
+index 142d43af..8c97cdfc 100644
 --- a/binutils/dlltool.c
 +++ b/binutils/dlltool.c
-@@ -241,6 +241,8 @@
- #include "dlltool.h"
+@@ -242,6 +242,8 @@
  #include "safe-ctype.h"
+ #include "coff-bfd.h"
  
 +#include <intl-reloc.h>
 +
  #include <time.h>
  #include <assert.h>
  
-@@ -4051,6 +4053,10 @@ main (int ac, char **av)
+@@ -3868,6 +3870,10 @@ main (int ac, char **av)
    int c;
    int i;
    char *firstarg = 0;
@@ -194,10 +188,10 @@ index cd2ff243..838325b6 100644
    program_name = av[0];
    oav = av;
  
-@@ -4060,8 +4066,20 @@ main (int ac, char **av)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
+@@ -3875,8 +3881,20 @@ main (int ac, char **av)
+   setlocale (LC_MESSAGES, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -218,7 +212,7 @@ index cd2ff243..838325b6 100644
    bfd_set_error_program_name (program_name);
    expandargv (&ac, &av);
 diff --git a/binutils/dllwrap.c b/binutils/dllwrap.c
-index 3a58e5fe..4f757a43 100644
+index e6fee8bb..c6921925 100644
 --- a/binutils/dllwrap.c
 +++ b/binutils/dllwrap.c
 @@ -26,6 +26,8 @@
@@ -230,7 +224,7 @@ index 3a58e5fe..4f757a43 100644
  #include <time.h>
  
  #ifdef HAVE_SYS_WAIT_H
-@@ -628,6 +630,10 @@ main (int argc, char **argv)
+@@ -628,14 +630,30 @@ main (int argc, char **argv)
  
    char *image_base_str = 0;
  
@@ -240,11 +234,10 @@ index 3a58e5fe..4f757a43 100644
 +
    prog_name = argv[0];
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
-@@ -636,8 +642,20 @@ main (int argc, char **argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
+ #ifdef HAVE_LC_MESSAGES
+   setlocale (LC_MESSAGES, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -262,13 +255,13 @@ index 3a58e5fe..4f757a43 100644
 +  textdomain(PACKAGE);
 +#endif
  
-   expandargv (&argc, &argv);
- 
+   warn (_("WARNING: %s is deprecated, use gcc -shared or ld -shared instead\n"),
+ 	prog_name);
 diff --git a/binutils/elfedit.c b/binutils/elfedit.c
-index 2a5d36d5..17896a1b 100644
+index fbdefd64..f9e809f7 100644
 --- a/binutils/elfedit.c
 +++ b/binutils/elfedit.c
-@@ -43,6 +43,8 @@
+@@ -44,6 +44,8 @@
  #include "safe-ctype.h"
  #include "filenames.h"
  
@@ -277,20 +270,18 @@ index 2a5d36d5..17896a1b 100644
  char * program_name = "elfedit";
  static long archive_file_offset;
  static unsigned long archive_file_size;
-@@ -924,6 +926,9 @@ int
- main (int argc, char ** argv)
+@@ -996,13 +998,28 @@ main (int argc, char ** argv)
  {
    int c, status;
+   char *end;
 +#ifdef ENABLE_NLS
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -931,8 +936,20 @@ main (int argc, char ** argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -311,19 +302,19 @@ index 2a5d36d5..17896a1b 100644
    expandargv (&argc, &argv);
  
 diff --git a/binutils/nm.c b/binutils/nm.c
-index 2aec0496..3bbef434 100644
+index f96cfa31..93f6b981 100644
 --- a/binutils/nm.c
 +++ b/binutils/nm.c
-@@ -39,6 +39,8 @@
- #include "plugin-api.h"
- #include "plugin.h"
+@@ -44,6 +44,8 @@
+ #define streq(a,b) (strcmp ((a),(b)) == 0)
+ #endif
  
 +#include <intl-reloc.h>
 +
  /* When sorting by size, we use this structure to hold the size and a
     pointer to the minisymbol.  */
  
-@@ -1642,6 +1644,9 @@ main (int argc, char **argv)
+@@ -1951,14 +1953,29 @@ main (int argc, char **argv)
  {
    int c;
    int retval;
@@ -331,12 +322,11 @@ index 2aec0496..3bbef434 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -1650,8 +1655,20 @@ main (int argc, char **argv)
+ #endif
    setlocale (LC_CTYPE, "");
    setlocale (LC_COLLATE, "");
- #endif
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -357,10 +347,10 @@ index 2aec0496..3bbef434 100644
    program_name = *argv;
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/objcopy.c b/binutils/objcopy.c
-index 0e17b863..8e9b2ca0 100644
+index 3569b890..5d6e0bbf 100644
 --- a/binutils/objcopy.c
 +++ b/binutils/objcopy.c
-@@ -32,6 +32,8 @@
+@@ -31,6 +31,8 @@
  #include "libcoff.h"
  #include "safe-ctype.h"
  
@@ -369,7 +359,7 @@ index 0e17b863..8e9b2ca0 100644
  /* FIXME: See bfd/peXXigen.c for why we include an architecture specific
     header in generic PE code.  */
  #include "coff/i386.h"
-@@ -5647,14 +5649,30 @@ copy_main (int argc, char *argv[])
+@@ -6090,12 +6092,28 @@ copy_main (int argc, char *argv[])
  int
  main (int argc, char *argv[])
  {
@@ -377,12 +367,10 @@ index 0e17b863..8e9b2ca0 100644
 +  const char *localedir, *codeset;
 +#endif
 +
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
  #endif
- #if defined (HAVE_SETLOCALE)
    setlocale (LC_CTYPE, "");
- #endif
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -403,10 +391,10 @@ index 0e17b863..8e9b2ca0 100644
    program_name = argv[0];
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/objdump.c b/binutils/objdump.c
-index 87253906..5ab3e262 100644
+index a35982ea..5eefc3d8 100644
 --- a/binutils/objdump.c
 +++ b/binutils/objdump.c
-@@ -66,6 +66,8 @@
+@@ -68,6 +68,8 @@
  #include "budbg.h"
  #include "objdump.h"
  
@@ -415,29 +403,28 @@ index 87253906..5ab3e262 100644
  #ifdef HAVE_MMAP
  #include <sys/mman.h>
  #endif
-@@ -4013,6 +4015,9 @@ main (int argc, char **argv)
+@@ -5871,14 +5873,31 @@ main (int argc, char **argv)
    int c;
    char *target = default_target;
-   bfd_boolean seenflag = FALSE;
+   bool seenflag = false;
 +#ifdef ENABLE_NLS
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE)
- #if defined (HAVE_LC_MESSAGES)
-@@ -4020,9 +4025,20 @@ main (int argc, char **argv)
+ #ifdef HAVE_LC_MESSAGES
+   setlocale (LC_MESSAGES, "");
  #endif
    setlocale (LC_CTYPE, "");
- #endif
+ 
 +#if defined (__MINGW32__) || defined (__MINGW64__)
 +  adjust_locale();
 +#endif
 +#ifdef ENABLE_NLS
 +  localedir = get_locale_path(LOCALEDIR);
 +  codeset = find_codeset();
- 
--  bindtextdomain (PACKAGE, LOCALEDIR);
--  textdomain (PACKAGE);
++
+   bindtextdomain (PACKAGE, LOCALEDIR);
+   textdomain (PACKAGE);
 +  bindtextdomain(PACKAGE, localedir);
 +
 +  if (codeset)
@@ -449,19 +436,19 @@ index 87253906..5ab3e262 100644
    program_name = *argv;
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/readelf.c b/binutils/readelf.c
-index 28eaa447..077c16b5 100644
+index 97d72d0b..29d9ae92 100644
 --- a/binutils/readelf.c
 +++ b/binutils/readelf.c
-@@ -61,6 +61,8 @@
- #include "elfcomm.h"
- #include "dwarf.h"
+@@ -66,6 +66,8 @@
+ #include "sframe-api.h"
+ #include "demangle.h"
  
 +#include <intl-reloc.h>
 +
  #include "elf/common.h"
  #include "elf/external.h"
  #include "elf/internal.h"
-@@ -19739,6 +19741,9 @@ int
+@@ -23140,13 +23142,28 @@ int
  main (int argc, char ** argv)
  {
    int err;
@@ -469,12 +456,10 @@ index 28eaa447..077c16b5 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -19746,8 +19751,20 @@ main (int argc, char ** argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -495,7 +480,7 @@ index 28eaa447..077c16b5 100644
    expandargv (&argc, &argv);
  
 diff --git a/binutils/size.c b/binutils/size.c
-index 93ec0269..fc9a806f 100644
+index 94738977..02809065 100644
 --- a/binutils/size.c
 +++ b/binutils/size.c
 @@ -34,6 +34,8 @@
@@ -507,7 +492,7 @@ index 93ec0269..fc9a806f 100644
  #ifndef BSD_DEFAULT
  #define BSD_DEFAULT 1
  #endif
-@@ -119,6 +121,9 @@ int main (int, char **);
+@@ -132,6 +134,9 @@ int main (int, char **);
  int
  main (int argc, char **argv)
  {
@@ -517,10 +502,10 @@ index 93ec0269..fc9a806f 100644
    int temp;
    int c;
  
-@@ -128,8 +133,20 @@ main (int argc, char **argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
+@@ -139,8 +144,20 @@ main (int argc, char **argv)
+   setlocale (LC_MESSAGES, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -541,7 +526,7 @@ index 93ec0269..fc9a806f 100644
    program_name = *argv;
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/srconv.c b/binutils/srconv.c
-index 39c1a4f4..cc22548d 100644
+index 8f73152d..1e6fe309 100644
 --- a/binutils/srconv.c
 +++ b/binutils/srconv.c
 @@ -34,6 +34,8 @@
@@ -553,7 +538,7 @@ index 39c1a4f4..cc22548d 100644
  #include "coff/internal.h"
  #include "../bfd/libcoff.h"
  
-@@ -1723,6 +1725,9 @@ main (int ac, char **av)
+@@ -1722,13 +1724,28 @@ main (int ac, char **av)
    char **matching;
    char *input_file;
    char *output_file;
@@ -561,12 +546,10 @@ index 39c1a4f4..cc22548d 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -1730,8 +1735,20 @@ main (int ac, char **av)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -587,28 +570,30 @@ index 39c1a4f4..cc22548d 100644
    program_name = av[0];
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/strings.c b/binutils/strings.c
-index 1b811de4..9420c8d3 100644
+index bd1ec04a..0ce86997 100644
 --- a/binutils/strings.c
 +++ b/binutils/strings.c
-@@ -76,6 +76,8 @@
- #include "safe-ctype.h"
- #include "bucomm.h"
+@@ -106,6 +106,8 @@ typedef enum unicode_display_type
+ 
+ static unicode_display_type unicode_display = unicode_default;
  
 +#include <intl-reloc.h>
 +
  #define STRING_ISGRAPHIC(c) \
        (   (c) >= 0 \
         && (c) <= 255 \
-@@ -148,12 +150,24 @@ main (int argc, char **argv)
-   bfd_boolean files_given = FALSE;
-   char *s;
+@@ -203,10 +205,25 @@ main (int argc, char **argv)
+   int exit_status = 0;
+   bool files_given = false;
    int numeric_opt = 0;
 +#ifdef ENABLE_NLS
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE)
--  setlocale (LC_ALL, "");
+   setlocale (LC_ALL, "");
+-  bindtextdomain (PACKAGE, LOCALEDIR);
+-  textdomain (PACKAGE);
++#if defined (__MINGW32__) || defined (__MINGW64__)
 +  adjust_locale();
 +#endif
 +#ifdef ENABLE_NLS
@@ -621,14 +606,12 @@ index 1b811de4..9420c8d3 100644
 +    bind_textdomain_codeset(PACKAGE, codeset);
 +
 +  textdomain(PACKAGE);
- #endif
--  bindtextdomain (PACKAGE, LOCALEDIR);
--  textdomain (PACKAGE);
++#endif
  
    program_name = argv[0];
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/sysdump.c b/binutils/sysdump.c
-index 1c48388d..ba8d291f 100644
+index 57dcee4a..3db34143 100644
 --- a/binutils/sysdump.c
 +++ b/binutils/sysdump.c
 @@ -32,6 +32,8 @@
@@ -640,7 +623,7 @@ index 1c48388d..ba8d291f 100644
  static int dump = 1;
  static int segmented_p;
  static int code;
-@@ -652,6 +654,9 @@ show_usage (FILE *ffile, int status)
+@@ -659,6 +661,9 @@ show_usage (FILE *ffile, int status)
  int
  main (int ac, char **av)
  {
@@ -650,10 +633,10 @@ index 1c48388d..ba8d291f 100644
    char *input_file = NULL;
    int option;
    static struct option long_options[] =
-@@ -667,8 +672,20 @@ main (int ac, char **av)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
+@@ -672,8 +677,20 @@ main (int ac, char **av)
+   setlocale (LC_MESSAGES, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -674,7 +657,7 @@ index 1c48388d..ba8d291f 100644
    program_name = av[0];
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/windmc.c b/binutils/windmc.c
-index eaf4d6e4..67153b37 100644
+index b1db2b53..0d9b87cd 100644
 --- a/binutils/windmc.c
 +++ b/binutils/windmc.c
 @@ -41,6 +41,8 @@
@@ -686,7 +669,7 @@ index eaf4d6e4..67153b37 100644
  /* Defines a message compiler element item with length and offset
     information.  */
  typedef struct mc_msg_item
-@@ -940,6 +942,9 @@ main (int argc, char **argv)
+@@ -938,13 +940,28 @@ main (int argc, char **argv)
    int c;
    char *target, *input_filename;
    int verbose;
@@ -694,12 +677,10 @@ index eaf4d6e4..67153b37 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -947,8 +952,20 @@ main (int argc, char **argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -720,7 +701,7 @@ index eaf4d6e4..67153b37 100644
    program_name = argv[0];
    xmalloc_set_program_name (program_name);
 diff --git a/binutils/windres.c b/binutils/windres.c
-index 9132fa8e..0d16e034 100644
+index 17009884..c99a3d7a 100644
 --- a/binutils/windres.c
 +++ b/binutils/windres.c
 @@ -44,6 +44,8 @@
@@ -732,7 +713,7 @@ index 9132fa8e..0d16e034 100644
  /* Used by resrc.c at least.  */
  
  int verbose = 0;
-@@ -796,6 +798,9 @@ main (int argc, char **argv)
+@@ -798,13 +800,28 @@ main (int argc, char **argv)
    int language;
    rc_res_directory *resources;
    int use_temp_file;
@@ -740,12 +721,10 @@ index 9132fa8e..0d16e034 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -803,8 +808,20 @@ main (int argc, char **argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -766,10 +745,10 @@ index 9132fa8e..0d16e034 100644
    program_name = argv[0];
    xmalloc_set_program_name (program_name);
 diff --git a/gas/as.c b/gas/as.c
-index 728811bc..f3614bf0 100644
+index 6839c841..87dcb0f3 100644
 --- a/gas/as.c
 +++ b/gas/as.c
-@@ -51,6 +51,8 @@
+@@ -52,6 +52,8 @@
  #define itbl_init()
  #endif
  
@@ -778,20 +757,10 @@ index 728811bc..f3614bf0 100644
  #ifdef USING_CGEN
  /* Perform any cgen specific initialisation for gas.  */
  extern void gas_cgen_begin (void);
-@@ -1201,6 +1203,9 @@ perform_an_assembly_pass (int argc, char ** argv)
- int
- main (int argc, char ** argv)
- {
-+#ifdef ENABLE_NLS
-+  const char *localedir, *codeset;
-+#endif
-   char ** argv_orig = argv;
-   struct stat sob;
- 
-@@ -1215,8 +1220,20 @@ main (int argc, char ** argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
+@@ -1259,8 +1261,20 @@ gas_early_init (int *argcp, char ***argvp)
+   setlocale (LC_MESSAGES, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -811,8 +780,18 @@ index 728811bc..f3614bf0 100644
  
    if (debug_memory)
      chunksize = 64;
+@@ -1361,6 +1375,9 @@ gas_init (void)
+ int
+ main (int argc, char ** argv)
+ {
++#ifdef ENABLE_NLS
++  const char *localedir, *codeset;
++#endif
+   char ** argv_orig = argv;
+   struct stat sob;
+ 
 diff --git a/gold/dwp.cc b/gold/dwp.cc
-index c312b7db..f0995373 100644
+index 0ccee10e..172a5107 100644
 --- a/gold/dwp.cc
 +++ b/gold/dwp.cc
 @@ -46,6 +46,8 @@
@@ -857,7 +836,7 @@ index c312b7db..f0995373 100644
    program_name = argv[0];
  
 diff --git a/gold/main.cc b/gold/main.cc
-index db3d1e44..5884f1f3 100644
+index c6aa1901..670af8de 100644
 --- a/gold/main.cc
 +++ b/gold/main.cc
 @@ -50,6 +50,8 @@
@@ -902,7 +881,7 @@ index db3d1e44..5884f1f3 100644
    program_name = argv[0];
  
 diff --git a/gprof/gprof.c b/gprof/gprof.c
-index db425a69..7a2ac9cc 100644
+index 9392575f..99a20085 100644
 --- a/gprof/gprof.c
 +++ b/gprof/gprof.c
 @@ -45,6 +45,8 @@
@@ -914,7 +893,7 @@ index db425a69..7a2ac9cc 100644
  static void usage (FILE *, int) ATTRIBUTE_NORETURN;
  
  const char * whoami;
-@@ -186,6 +188,9 @@ main (int argc, char **argv)
+@@ -186,14 +188,27 @@ main (int argc, char **argv)
    char **sp, *str;
    Sym **cg = 0;
    int ch, user_specified = 0;
@@ -922,18 +901,16 @@ index db425a69..7a2ac9cc 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -194,8 +199,19 @@ main (int argc, char **argv)
-   setlocale (LC_CTYPE, "");
  #endif
- #ifdef ENABLE_NLS
--  bindtextdomain (PACKAGE, LOCALEDIR);
--  textdomain (PACKAGE);
+   setlocale (LC_CTYPE, "");
 +#if defined (__MINGW32__) || defined (__MINGW64__)
 +  adjust_locale();
 +#endif
-+
+ #ifdef ENABLE_NLS
+-  bindtextdomain (PACKAGE, LOCALEDIR);
+-  textdomain (PACKAGE);
 +  localedir = get_locale_path(LOCALEDIR);
 +  codeset = find_codeset();
 +
@@ -972,19 +949,19 @@ index 00000000..e9c93fc5
 +#endif /* _RELOCATE_H_ */
 +
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index bdd656a7..b46c5291 100644
+index 06ac2c64..1914ef30 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -43,6 +43,8 @@
+@@ -44,6 +44,8 @@
  #include "plugin-api.h"
- #endif /* ENABLE_PLUGINS */
+ #endif /* BFD_SUPPORTS_PLUGINS */
  
 +#include <intl-reloc.h>
 +
  /* Somewhere above, sys/stat.h got included.  */
  #if !defined(S_ISDIR) && defined(S_IFDIR)
  #define	S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
-@@ -192,6 +194,9 @@ main (int argc, char **argv)
+@@ -251,13 +253,28 @@ main (int argc, char **argv)
  {
    char *emulation;
    long start_time = get_run_time ();
@@ -992,12 +969,10 @@ index bdd656a7..b46c5291 100644
 +  const char *localedir, *codeset;
 +#endif
  
- #if defined (HAVE_SETLOCALE) && defined (HAVE_LC_MESSAGES)
+ #ifdef HAVE_LC_MESSAGES
    setlocale (LC_MESSAGES, "");
-@@ -199,8 +204,20 @@ main (int argc, char **argv)
- #if defined (HAVE_SETLOCALE)
-   setlocale (LC_CTYPE, "");
  #endif
+   setlocale (LC_CTYPE, "");
 -  bindtextdomain (PACKAGE, LOCALEDIR);
 -  textdomain (PACKAGE);
 +#if defined (__MINGW32__) || defined (__MINGW64__)
@@ -1018,10 +993,10 @@ index bdd656a7..b46c5291 100644
    program_name = argv[0];
    xmalloc_set_program_name (program_name);
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index 0be45b4a..a9667e10 100644
+index f9fbba23..7b5ff796 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
-@@ -159,7 +159,7 @@ CFILES = alloca.c argv.c asprintf.c atexit.c				\
+@@ -161,7 +161,7 @@ CFILES = alloca.c argv.c asprintf.c atexit.c				\
  	 vsnprintf.c vsprintf.c						\
  	waitpid.c							\
  	xasprintf.c xatexit.c xexit.c xmalloc.c xmemdup.c xstrdup.c	\
@@ -1030,7 +1005,7 @@ index 0be45b4a..a9667e10 100644
  
  # These are always included in the library.  The first four are listed
  # first and by compile time to optimize parallel builds.
-@@ -194,7 +194,7 @@ REQUIRED_OFILES =							\
+@@ -198,7 +198,7 @@ REQUIRED_OFILES =							\
  	./xasprintf.$(objext) ./xatexit.$(objext) ./xexit.$(objext)	\
  	./xmalloc.$(objext) ./xmemdup.$(objext) ./xstrdup.$(objext)	\
  	./xstrerror.$(objext) ./xstrndup.$(objext)			\
@@ -1039,7 +1014,7 @@ index 0be45b4a..a9667e10 100644
  
  # These are all the objects that configure may add to the library via
  # $funcs or EXTRA_OFILES.  This list exists here only for "make
-@@ -1719,3 +1719,12 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
+@@ -1771,3 +1771,12 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
  	  $(COMPILE.c) $(PICFLAG) $(NOASANFLAG) $(srcdir)/xvasprintf.c -o noasan/$@; \
  	else true; fi
  	$(COMPILE.c) $(srcdir)/xvasprintf.c $(OUTPUT_OPTION)
@@ -1361,5 +1336,5 @@ index 00000000..c7e246d6
 +	return path;
 +}
 -- 
-2.17.1
+2.34.1
 

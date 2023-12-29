@@ -1,6 +1,6 @@
 
 NAME=xz
-VERSION=5.2.4
+VERSION=5.4.5
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://tukaani.org/xz/$(SOURCE_FILE)
 
