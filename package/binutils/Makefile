@@ -16,7 +16,6 @@ CONFIGURE_ARGS= \
 	--enable-nls \
 	--enable-ld \
 	--enable-lto \
-	--enable-gold \
 	--enable-plugins \
 	--enable-deterministic-archives \
 	--with-sysroot=$(SYSROOT_PREFIX)
@@ -24,6 +23,10 @@ CONFIGURE_ARGS= \
 LIBS_CFLAGS := -I$(HOST_OUTPUT_PREFIX)/include
 LIBS_CXXFLAGS := $(LIBS_CFLAGS)
 LIBS_LDFLAGS := -L$(HOST_OUTPUT_PREFIX)/lib
+
+ifneq ($(strip $(BINUTILS_NO_GOLD)),y)
+CONFIGURE_ARGS += --enable-gold
+endif
 
 all: install
 	true
