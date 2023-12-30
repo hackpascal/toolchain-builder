@@ -117,9 +117,11 @@ binutils: gmp mpfr mpc isl zlib libiconv
 
 dir-prep:
 	mkdir -p $(FINAL_SYSROOT_DIR)/lib
+	ln -sf lib $(FINAL_SYSROOT_DIR)/lib64
 	mkdir -p $(FINAL_SYSROOT_DIR)/include
 	ln -sf $(SYSROOT_NAME)/include $(FINAL_OUTPUT_DIR)/$(TARGET)/include
 	mkdir -p $(BUILD_SYSROOT)/lib
+	ln -sf lib $(BUILD_SYSROOT)/lib64
 	mkdir -p $(BUILD_SYSROOT)/include
 
 ifneq ($(LIBC),none)
