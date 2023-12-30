@@ -1,6 +1,6 @@
 
 NAME=binutils
-VERSION=2.32
+VERSION=2.41
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
 URL=https://ftp.gnu.org/gnu/$(NAME)/$(SOURCE_FILE)
 

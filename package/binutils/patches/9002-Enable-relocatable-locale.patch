@@ -757,7 +757,18 @@ index 6839c841..87dcb0f3 100644
  #ifdef USING_CGEN
  /* Perform any cgen specific initialisation for gas.  */
  extern void gas_cgen_begin (void);
-@@ -1259,8 +1261,20 @@ gas_early_init (int *argcp, char ***argvp)
+@@ -1254,6 +1254,10 @@ free_notes (void)
+ static void
+ gas_early_init (int *argcp, char ***argvp)
+ {
++#ifdef ENABLE_NLS
++  const char *localedir, *codeset;
++#endif
++
+   start_time = get_run_time ();
+   signal_init ();
+ 
+@@ -1261,8 +1265,20 @@ gas_early_init (int *argcp, char ***argv
    setlocale (LC_MESSAGES, "");
  #endif
    setlocale (LC_CTYPE, "");
@@ -780,16 +791,6 @@ index 6839c841..87dcb0f3 100644
  
    if (debug_memory)
      chunksize = 64;
-@@ -1361,6 +1375,9 @@ gas_init (void)
- int
- main (int argc, char ** argv)
- {
-+#ifdef ENABLE_NLS
-+  const char *localedir, *codeset;
-+#endif
-   char ** argv_orig = argv;
-   struct stat sob;
- 
 diff --git a/gold/dwp.cc b/gold/dwp.cc
 index 0ccee10e..172a5107 100644
 --- a/gold/dwp.cc
