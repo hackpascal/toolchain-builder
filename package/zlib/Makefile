@@ -1,6 +1,6 @@
 
 NAME=zlib
-VERSION=1.3
+VERSION=1.3.1
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
 URL=https://zlib.net/$(SOURCE_FILE)
 

@@ -1,8 +1,8 @@
 
 NAME=musl
-VERSION=1.2.4
+VERSION=1.2.5
 SOURCE_FILE=$(NAME)-$(VERSION).tar.gz
-URL=https://www.musl-libc.org/releases/$(SOURCE_FILE)
+URL=https://musl.libc.org/releases/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
 PACKAGE_BUILD_DIR=$(STAGE_BUILD_DIR)/$(NAME)-$(VERSION)

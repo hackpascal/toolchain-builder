@@ -1,8 +1,8 @@
 
 NAME=linux
-VERSION=6.6.8
+VERSION=6.6.60
 SOURCE_FILE=$(NAME)-$(VERSION).tar.xz
-URL=https://cdn.kernel.org/pub/linux/kernel/v5.x/$(SOURCE_FILE)
+URL=https://cdn.kernel.org/pub/linux/kernel/v6.x/$(SOURCE_FILE)
 
 PACKAGE_SOURCE_DIR=$(SOURCEDIR)/$(NAME)-$(VERSION)
 
