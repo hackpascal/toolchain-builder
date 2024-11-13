@@ -131,7 +131,7 @@ install: build
 	[ -f $(PACKAGE_BUILD_DIR)/.installed ] || ( \
 		$(MAKE) -C $(PACKAGE_BUILD_DIR) install DESTDIR=$(INSTALL_DIR) && \
 		$(LIBC_NANO_RENAME) \
-		([ -d $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib ] && cp -a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/* $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
+		([ -d $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib ] && cp -a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib/* $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
 		([ -d $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64 ] && cp -a $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/lib64/* $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/ || true ) && \
 		sed -i 's/$(subst /,\/,$(INSTALL_DIR))//g' $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET)/$(VERSION)/install-tools/mkheaders.conf && \
 		find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e "s/'$(subst /,\/,$(TARGET_OUTPUT_DIR)/toolchain/usr/lib/gcc/$(TARGET)/$(VERSION))'\/libstdc++.la//g"; \
