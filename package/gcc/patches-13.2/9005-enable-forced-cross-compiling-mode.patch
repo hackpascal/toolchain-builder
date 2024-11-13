@@ -1,0 +1,327 @@
+--- a/config/acx.m4
++++ b/config/acx.m4
+@@ -540,7 +540,7 @@ AC_SUBST(LN)dnl
+ dnl GCC_TARGET_TOOL(PROGRAM, TARGET-VAR, HOST-VAR, IN-TREE-TOOL, LANGUAGE)
+ AC_DEFUN([GCC_TARGET_TOOL],
+ [AC_MSG_CHECKING(where to find the target $1)
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x[$]$2" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname [$]$2`
+--- a/configure
++++ b/configure
+@@ -794,6 +794,7 @@ alphaieee_frag
+ ospace_frag'
+ ac_user_opts='
+ enable_option_checking
++enable_force_cross_compiling
+ with_build_libsubdir
+ with_system_zlib
+ enable_as_accelerator_for
+@@ -1523,6 +1524,8 @@ Optional Features:
+   --disable-option-checking  ignore unrecognized --enable/--with options
+   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
++  --enable-force-cross-compiling
++                          enable forcing corss compiling mode
+   --enable-as-accelerator-for=ARG
+                           build as offload target compiler. Specify offload
+                           host triple by ARG
+@@ -2881,6 +2884,17 @@ else
+   is_cross_compiler=yes
+ fi
+ 
++# Check whether --enable-force-cross-compiling was given.
++if test "${enable_force_cross_compiling+set}" = set; then :
++  enableval=$enable_force_cross_compiling;
++  if test x${enable_force_cross_compiling} = xyes; then
++    cross_compiling=yes
++    is_cross_compiler=yes
++  fi
++
++fi
++
++
+ # Find the build and target subdir names.
+ 
+ # post-stage1 host modules use a different CC_FOR_BUILD so, in order to
+@@ -10718,7 +10732,7 @@ test -n "$EXPECT" || EXPECT="expect"
+ 
+ case " $configdirs " in
+   *" expect "*)
+-    test $host = $build && EXPECT='$$r/$(HOST_SUBDIR)/expect/expect'
++    test $host = $build -a "x${enable_force_cross_compiling}" != "xyes" && EXPECT='$$r/$(HOST_SUBDIR)/expect/expect'
+     ;;
+ esac
+ 
+@@ -10767,7 +10781,7 @@ test -n "$RUNTEST" || RUNTEST="runtest"
+ 
+ case " $configdirs " in
+   *" dejagnu "*)
+-    test $host = $build && RUNTEST='$$s/$(HOST_SUBDIR)/dejagnu/runtest'
++    test $host = $build -a "x${enable_force_cross_compiling}" != "xyes" && RUNTEST='$$s/$(HOST_SUBDIR)/dejagnu/runtest'
+     ;;
+ esac
+ 
+@@ -17499,7 +17513,7 @@ RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET"
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ar" >&5
+ $as_echo_n "checking where to find the target ar... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$AR_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $AR_FOR_TARGET`
+@@ -17541,7 +17555,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target as" >&5
+ $as_echo_n "checking where to find the target as... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$AS_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $AS_FOR_TARGET`
+@@ -17583,7 +17597,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target cc" >&5
+ $as_echo_n "checking where to find the target cc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$CC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $CC_FOR_TARGET`
+@@ -17625,7 +17639,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target c++" >&5
+ $as_echo_n "checking where to find the target c++... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$CXX_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $CXX_FOR_TARGET`
+@@ -17670,7 +17684,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target c++ for libstdc++" >&5
+ $as_echo_n "checking where to find the target c++ for libstdc++... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$RAW_CXX_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $RAW_CXX_FOR_TARGET`
+@@ -17715,7 +17729,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target dlltool" >&5
+ $as_echo_n "checking where to find the target dlltool... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$DLLTOOL_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $DLLTOOL_FOR_TARGET`
+@@ -17757,7 +17771,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target dsymutil" >&5
+ $as_echo_n "checking where to find the target dsymutil... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$DSYMUTIL_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $DSYMUTIL_FOR_TARGET`
+@@ -17788,7 +17802,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gcc" >&5
+ $as_echo_n "checking where to find the target gcc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$GCC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GCC_FOR_TARGET`
+@@ -17830,7 +17844,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gfortran" >&5
+ $as_echo_n "checking where to find the target gfortran... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$GFORTRAN_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GFORTRAN_FOR_TARGET`
+@@ -17875,7 +17889,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gccgo" >&5
+ $as_echo_n "checking where to find the target gccgo... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$GOC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GOC_FOR_TARGET`
+@@ -17920,7 +17934,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gdc" >&5
+ $as_echo_n "checking where to find the target gdc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$GDC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GDC_FOR_TARGET`
+@@ -17965,7 +17979,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gm2" >&5
+ $as_echo_n "checking where to find the target gm2... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$GM2_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GM2_FOR_TARGET`
+@@ -18010,7 +18024,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ld" >&5
+ $as_echo_n "checking where to find the target ld... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$LD_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $LD_FOR_TARGET`
+@@ -18052,7 +18066,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target lipo" >&5
+ $as_echo_n "checking where to find the target lipo... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$LIPO_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $LIPO_FOR_TARGET`
+@@ -18083,7 +18097,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target nm" >&5
+ $as_echo_n "checking where to find the target nm... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$NM_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $NM_FOR_TARGET`
+@@ -18125,7 +18139,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target objcopy" >&5
+ $as_echo_n "checking where to find the target objcopy... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$OBJCOPY_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $OBJCOPY_FOR_TARGET`
+@@ -18167,7 +18181,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target objdump" >&5
+ $as_echo_n "checking where to find the target objdump... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$OBJDUMP_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $OBJDUMP_FOR_TARGET`
+@@ -18209,7 +18223,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target otool" >&5
+ $as_echo_n "checking where to find the target otool... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$OTOOL_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $OTOOL_FOR_TARGET`
+@@ -18240,7 +18254,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ranlib" >&5
+ $as_echo_n "checking where to find the target ranlib... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$RANLIB_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $RANLIB_FOR_TARGET`
+@@ -18282,7 +18296,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target readelf" >&5
+ $as_echo_n "checking where to find the target readelf... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$READELF_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $READELF_FOR_TARGET`
+@@ -18324,7 +18338,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target strip" >&5
+ $as_echo_n "checking where to find the target strip... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$STRIP_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $STRIP_FOR_TARGET`
+@@ -18366,7 +18380,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target windres" >&5
+ $as_echo_n "checking where to find the target windres... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$WINDRES_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $WINDRES_FOR_TARGET`
+@@ -18408,7 +18422,7 @@ fi
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target windmc" >&5
+ $as_echo_n "checking where to find the target windmc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if test "x${build}" != "x${host}" -o "x${enable_force_cross_compiling}" = "xyes" ; then
+   if expr "x$WINDMC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $WINDMC_FOR_TARGET`
+@@ -18462,7 +18476,7 @@ NM_FOR_TARGET=${NM_FOR_TARGET}${extra_nm
+ COMPILER_AS_FOR_TARGET='$(AS_FOR_TARGET)'
+ COMPILER_LD_FOR_TARGET='$(LD_FOR_TARGET)'
+ COMPILER_NM_FOR_TARGET='$(NM_FOR_TARGET)'
+-if test $host = $build; then
++if test $host = $build -a "x${enable_force_cross_compiling}" != "xyes"; then
+   case " $configdirs " in
+     *" gcc "*)
+       COMPILER_AS_FOR_TARGET='$$r/$(HOST_SUBDIR)/gcc/as'
+--- a/configure.ac
++++ b/configure.ac
+@@ -211,6 +211,16 @@ else
+   is_cross_compiler=yes
+ fi	
+ 
++AC_ARG_ENABLE(force-cross-compiling,
++[AS_HELP_STRING([--enable-force-cross-compiling],
++		[enable forcing corss compiling mode])],
++[
++  if test x${enable_force_cross_compiling} = xyes; then
++    cross_compiling=yes
++    is_cross_compiler=yes
++  fi
++])
++
+ # Find the build and target subdir names.
+ GCC_TOPLEV_SUBDIRS
+ # Be sure to cover against remnants of an in-tree build.
+@@ -3579,14 +3589,14 @@ esac
+ AC_CHECK_PROGS(EXPECT, expect, expect)
+ case " $configdirs " in
+   *" expect "*)
+-    test $host = $build && EXPECT='$$r/$(HOST_SUBDIR)/expect/expect'
++    test $host = $build -a "x${enable_force_cross_compiling}" != "xyes" && EXPECT='$$r/$(HOST_SUBDIR)/expect/expect'
+     ;;
+ esac
+ 
+ AC_CHECK_PROGS(RUNTEST, runtest, runtest)
+ case " $configdirs " in
+   *" dejagnu "*)
+-    test $host = $build && RUNTEST='$$s/$(HOST_SUBDIR)/dejagnu/runtest'
++    test $host = $build -a "x${enable_force_cross_compiling}" != "xyes" && RUNTEST='$$s/$(HOST_SUBDIR)/dejagnu/runtest'
+     ;;
+ esac
+ 
+@@ -3699,7 +3709,7 @@ NM_FOR_TARGET=${NM_FOR_TARGET}${extra_nm
+ COMPILER_AS_FOR_TARGET='$(AS_FOR_TARGET)'
+ COMPILER_LD_FOR_TARGET='$(LD_FOR_TARGET)'
+ COMPILER_NM_FOR_TARGET='$(NM_FOR_TARGET)'
+-if test $host = $build; then
++if test $host = $build -a "x${enable_force_cross_compiling}" != "xyes"; then
+   case " $configdirs " in
+     *" gcc "*)
+       COMPILER_AS_FOR_TARGET='$$r/$(HOST_SUBDIR)/gcc/as'
