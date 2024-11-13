@@ -74,18 +74,25 @@ endif
 ifeq ($(STAGE),target)
 ifneq ($(WIN_HOST),)
 	-find $(FINAL_OUTPUT_DIR)/ -name '*.exe' -o -name '*.dll' | xargs $(HOST)-strip
-ifeq ($(STRIP_ALL),y)
-	-find $(FINAL_OUTPUT_DIR)/lib/gcc/$(TARGET) -name '*.so*' -o -name '*.a' -o -name '*.o' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
-	-find $(FINAL_OUTPUT_DIR)/libexec/gcc/$(TARGET) -name '*.so*' -o -name '*.a' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
-	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/lib -name '*.so*' -o -name '*.a' -o -name '*.o' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
-	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/lib64 -name '*.so*' -o -name '*.a' -o -name '*.o' | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
-	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/bin | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
-	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/sbin | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
-	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/libexec | xargs $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
-endif
 	$(TOPDIR)/symlinkconv.sh "$(FINAL_OUTPUT_DIR)"
 endif
 	find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e 's/-L$(subst /,\/,$(HOST_OUTPUT_PREFIX))\/lib//g' -e 's/$(subst /,\/,$(INSTALL_DIR))//g'
+	find $(FINAL_OUTPUT_DIR) -name '*.la' | xargs sed -i -e 's/-L$(subst /,\/,$(STAGE_BUILD_DIR))\/binutils-[0-9]\.[0-9][0-9]\/zlib //g' -e 's/-L$(subst /,\/,$(STAGE_BUILD_DIR))\/binutils-[0-9]\.[0-9][0-9]\/libiberty //g'
+endif
+ifeq ($(STRIP_ALL),y)
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/bin | xargs -r $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/sbin | xargs -r $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/$(SYSROOT_NAME)/libexec | xargs -r $(TOOLCHAIN_BIN_DIR)/$(TARGET)-strip
+
+ifneq ($(WIN_HOST),)
+	-find $(FINAL_OUTPUT_DIR)/bin -name '*.exe' | xargs $(HOST)-strip
+	-find $(FINAL_OUTPUT_DIR)/libexec -name '*.exe' -o -name '*.dll' | xargs $(HOST)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/bin -name '*.exe' | xargs $(HOST)-strip
+else
+	-find $(FINAL_OUTPUT_DIR)/bin | xargs $(HOST)-strip
+	-find $(FINAL_OUTPUT_DIR)/libexec | xargs $(HOST)-strip
+	-find $(FINAL_OUTPUT_DIR)/$(TARGET)/bin | xargs $(HOST)-strip
+endif
 endif
 
 gmp:
